@@ -30,7 +30,7 @@ export default function MfaSetup() {
     const { error } = await supabaseBrowser().auth.mfa.challengeAndVerify({ factorId: factor.id, code: code.trim() });
     setBusy(false);
     if (error) return setErr("That code did not work. Check the time on your phone and try the current code.");
-    location.assign("/desk");
+    location.assign("/onboarding");
   }
 
   return (

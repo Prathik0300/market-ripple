@@ -1,6 +1,9 @@
 # never upload local secrets, test notes, the local database config or build output
+# (anchored with a leading slash: a bare "supabase/" would also drop src/lib/supabase/)
 .env*
-TESTING.md
-supabase/
-node_modules/
-.next/
+/TESTING.md
+/supabase/
+/node_modules/
+/.next/
+/.next-alt/
+/api/__pycache__/

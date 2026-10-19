@@ -2,61 +2,65 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Libre+Franklin:ital,wght@0,400..800;1,400..600&display=swap">
 <style>
-/* Layout: an operations console. A left rail of desks (stacks into a scrolling tab strip on phones), a player bar on top,
-   and a "Today" home whose signature is the ripple radar: every recent world event as a pulse spreading from the centre.
-   Colour: deep navy neutrals; sapphire is the one action colour; champagne gold is the secondary, for highlights and
-   achievements; green and red mean price direction only; major events are high-contrast ink, not red. */
+/* Layout: a financial broadsheet. A left rail is the paper's section index (a scrolling strip on phones), a masthead
+   bar on top, and a "Today" front page led by the ripple radar: every recent world event as a pulse from the centre.
+   Type: Newsreader (serif) for headlines and big figures, Libre Franklin (the newspaper sans) for text, labels and tables.
+   Colour: newsprint cream and ink black; petrol blue is the one action colour; salmon is the highlighter; green and red
+   mean price direction only. Sections are ruled, not boxed in shadows: square corners, hairlines, a heavy rule on top.
+   Dark mode is the night edition: charcoal paper, cream ink. */
 :root {
-  --bg: #edf0f6;
-  --surface: #ffffff;
-  --surface-2: #f4f6fb;
-  --ink: #111a2e;
-  --muted: #586381;
-  --line: #d8deea;
-  --accent: #2453d1;
+  --bg: #f4eee3;
+  --surface: #fbf7ef;
+  --surface-2: #efe7d8;
+  --ink: #1b1813;
+  --muted: #6a5f52;
+  --line: #d6cbb8;
+  --accent: #0f5e73;
   --accent-ink: #ffffff;
-  --accent-soft: #e3e9fe;
-  --gold: #85600a;
-  --gold-soft: #f7eed6;
+  --accent-soft: #d8e8ea;
+  --salmon: #f3c9b5;
+  --gold: #8f5410;
+  --gold-soft: #f2e2c8;
   --gold-ink: #ffffff;
-  --up: #087a51;
-  --up-soft: #d9f2e7;
-  --down: #b92a47;
-  --down-soft: #fbe0e6;
-  --sev: #111a2e;
-  --warn: #85600a;
-  --edge: #8b95b0;
-  --l0: #6d4fd8; --l1: #2a7fc6; --l2: #a67812; --l3: #12857a; --l4: #b8467c;
-  --shadow: 0 1px 2px rgba(17, 26, 46, .06), 0 6px 18px rgba(17, 26, 46, .07);
-  --space: #f2f4f9; --space-dot: #d5dbea;
-  --tv: #0a1124; --tv-ink: #eaf0ff; --tv-muted: #a6b4d6; --tv-edge: rgba(124, 157, 255, .4); --tv-glow: rgba(84, 128, 255, .32); --tv-up: #4ee0a8; --tv-down: #ff7d97;
-  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --body: "Figtree", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --r: 14px;
+  --up: #1d6b45;
+  --up-soft: #dbe9dc;
+  --down: #b3261e;
+  --down-soft: #f5d9d3;
+  --sev: #1b1813;
+  --warn: #8f5410;
+  --edge: #9b8f7d;
+  --l0: #6b4c8a; --l1: #2c5f8a; --l2: #94661a; --l3: #2d7465; --l4: #a54a5f;
+  --shadow: none;
+  --space: #efe8db; --space-dot: #d9cfbd;
+  --tv: #1b1813; --tv-ink: #f4eee3; --tv-muted: #b9ad99; --tv-edge: rgba(243, 201, 181, .45); --tv-glow: rgba(243, 201, 181, .3); --tv-up: #8fd3a6; --tv-down: #f2a08f;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Libre Franklin", "Franklin Gothic Book", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Libre Franklin", "Franklin Gothic Book", "Helvetica Neue", Arial, sans-serif;
+  --code: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 0px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0a0f1d; --surface: #111829; --surface-2: #172034; --ink: #e6ebf7; --muted: #95a0bd; --line: #232e4a;
-    --accent: #7c9dff; --accent-ink: #0a0f1d; --accent-soft: #1a2650; --gold: #e3bd6a; --gold-soft: #2e2612; --gold-ink: #1d1505;
-    --up: #33cf96; --up-soft: #0f3326; --down: #ff6a85; --down-soft: #3b1522; --sev: #e6ebf7; --warn: #e3bd6a; --edge: #4a5677;
-    --l0: #a78bfa; --l1: #60a5fa; --l2: #e3bd6a; --l3: #2dd4bf; --l4: #f08cbf;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .28);
-    --space: #080c18; --space-dot: #1a2340;
-    --tv: #050916; --tv-ink: #eaf0ff; --tv-muted: #a0afd6; --tv-edge: rgba(124, 157, 255, .45); --tv-glow: rgba(84, 128, 255, .4); --tv-up: #4ee0a8; --tv-down: #ff7d97;
+    --bg: #15130f; --surface: #1c1915; --surface-2: #24201a; --ink: #ede5d6; --muted: #a59a88; --line: #39332a;
+    --accent: #7cc3d1; --accent-ink: #15130f; --accent-soft: #1d3338; --salmon: #6e3f30; --gold: #d9a35a; --gold-soft: #33261a; --gold-ink: #15130f;
+    --up: #74c393; --up-soft: #17301f; --down: #ec7d6c; --down-soft: #3a1c17; --sev: #ede5d6; --warn: #d9a35a; --edge: #5c5446;
+    --l0: #b393d6; --l1: #7fb0dc; --l2: #d9a35a; --l3: #6fc1ad; --l4: #e08ea2;
+    --shadow: none;
+    --space: #120f0c; --space-dot: #2c271f;
+    --tv: #0d0b09; --tv-ink: #ede5d6; --tv-muted: #a59a88; --tv-edge: rgba(243, 201, 181, .4); --tv-glow: rgba(243, 201, 181, .28); --tv-up: #8fd3a6; --tv-down: #f2a08f;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0a0f1d; --surface: #111829; --surface-2: #172034; --ink: #e6ebf7; --muted: #95a0bd; --line: #232e4a;
-  --accent: #7c9dff; --accent-ink: #0a0f1d; --accent-soft: #1a2650; --gold: #e3bd6a; --gold-soft: #2e2612; --gold-ink: #1d1505;
-  --up: #33cf96; --up-soft: #0f3326; --down: #ff6a85; --down-soft: #3b1522; --sev: #e6ebf7; --warn: #e3bd6a; --edge: #4a5677;
-  --l0: #a78bfa; --l1: #60a5fa; --l2: #e3bd6a; --l3: #2dd4bf; --l4: #f08cbf;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .28);
-  --space: #080c18; --space-dot: #1a2340;
-  --tv: #050916; --tv-ink: #eaf0ff; --tv-muted: #a0afd6; --tv-edge: rgba(124, 157, 255, .45); --tv-glow: rgba(84, 128, 255, .4); --tv-up: #4ee0a8; --tv-down: #ff7d97;
+  --bg: #15130f; --surface: #1c1915; --surface-2: #24201a; --ink: #ede5d6; --muted: #a59a88; --line: #39332a;
+  --accent: #7cc3d1; --accent-ink: #15130f; --accent-soft: #1d3338; --salmon: #6e3f30; --gold: #d9a35a; --gold-soft: #33261a; --gold-ink: #15130f;
+  --up: #74c393; --up-soft: #17301f; --down: #ec7d6c; --down-soft: #3a1c17; --sev: #ede5d6; --warn: #d9a35a; --edge: #5c5446;
+  --l0: #b393d6; --l1: #7fb0dc; --l2: #d9a35a; --l3: #6fc1ad; --l4: #e08ea2;
+  --shadow: none;
+  --space: #120f0c; --space-dot: #2c271f;
+  --tv: #0d0b09; --tv-ink: #ede5d6; --tv-muted: #a59a88; --tv-edge: rgba(243, 201, 181, .4); --tv-glow: rgba(243, 201, 181, .28); --tv-up: #8fd3a6; --tv-down: #f2a08f;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -551,6 +555,70 @@ input[type="text"], input[type="search"], input[type="number"], textarea { curso
 .toast .tx { font-family: var(--mono); color: var(--gold); }
 @keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .toast, .status-dot.live i { animation: none; } .xpbar i, .xpline i, .edge { transition: none; } }
+
+/* ---------- broadsheet layer: ruled sections, square corners, serif headlines ---------- */
+::selection { background: var(--salmon); color: var(--ink); }
+body { font-size: 15px; line-height: 1.55; font-feature-settings: "lnum" 1; }
+h1, h2, h3, h4 { font-family: var(--display); letter-spacing: -0.01em; font-optical-sizing: auto; }
+h1 { font-weight: 600; line-height: 1.04; font-size: clamp(1.9rem, 3.6vw, 2.8rem); }
+h2 { font-weight: 600; font-size: 1.5rem; }
+h3 { font-weight: 600; font-size: 1.2rem; }
+h4 { font-weight: 600; }
+code, kbd, pre, ol.steps code { font-family: var(--code); }
+.num, .mono, .tile .v { font-variant-numeric: lining-nums tabular-nums; }
+.eyebrow, .tile .k, .tag, .brand span, .crt .cm, .nav a .pip { font-family: var(--body); font-weight: 700; letter-spacing: .12em; }
+.eyebrow { color: var(--accent); font-size: .68rem; }
+:focus-visible { border-radius: 0; outline-offset: 3px; }
+/* corners: square for everything that was a soft card or pill; dots, rings and medals stay round */
+.btn, .daycard, .fact, .field input, .field select, .field textarea, .inp, .gitem .gi, .gtip, .kg-tools button, .lnk, .mission .ic,
+.nav a, .note, .res-item, .seg, .seg button, .verdict, textarea.note-box, .calc, .calc input[type="number"], .crt, .crt .cs span, .dirpick button,
+.dirpick.nudge, .ego-wrap, .chart-wrap, .fitem, .toast, details.how, .badge, .hero, .tag, .alloc, .mini-mover.rowlink, .radar-tip,
+.mobnav a, .chip, .more-btn, .nchip, .player, .iconbtn, .nav a .pip, .meter, .meter i, .bar, .bar i, .xpbar, .xpbar i, .xpline, .xpline i { border-radius: 0 !important; }
+/* sections: a heavy ink rule on top, hairlines elsewhere, no floating shadows */
+.card, .hero, .tile { box-shadow: none !important; }
+.card { border: 1px solid var(--line); border-top: 3px solid var(--ink); background: var(--surface); }
+.card.flat { border-top-width: 1px; border-top-color: var(--line); }
+.card-h { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.tile { background: transparent; border: 0; border-top: 1px solid var(--ink); padding: 10px 2px 2px; }
+.tile .v { font-family: var(--display); font-weight: 600; font-size: 1.9rem; }
+/* masthead and section index */
+.brand b { font-family: var(--display); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.015em; }
+.brand span { font-size: .6rem; letter-spacing: .2em; }
+.rail { background: var(--bg); }
+.nav a { border-left: 3px solid transparent; padding-left: 10px; font-weight: 600; }
+.nav a:hover { background: transparent; color: var(--ink); border-left-color: var(--line); }
+.nav a[aria-current="page"] { background: transparent; color: var(--ink); border-left-color: var(--accent); font-weight: 700; }
+.topbar { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom: 3px double var(--ink); }
+.topbar .where { font-family: var(--display); font-weight: 600; font-size: 1.2rem; }
+.player { background: transparent; border: 1px solid var(--ink); }
+.lvl { font-family: var(--display); }
+.mobnav a { border-color: var(--line); background: transparent; }
+.mobnav a[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+/* controls: ink buttons, outlined secondaries, square tags */
+.btn { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; letter-spacing: .01em; }
+.btn:hover { filter: none; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn.ghost:hover { background: var(--ink); color: var(--bg); }
+.btn.quiet { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn.quiet:hover { border-color: var(--ink); background: transparent; color: var(--ink); }
+.btn.up-b:hover { background: var(--up); border-color: var(--up); color: var(--surface); }
+.btn.down-b:hover { background: var(--down); border-color: var(--down); color: var(--surface); }
+.chip { background: transparent; font-weight: 600; }
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.tag { font-size: .62rem; }
+.tag.notable, .tag.good { background: var(--salmon); color: var(--ink); }
+.seg { background: transparent; border: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.note { background: transparent; border-left: 3px solid var(--salmon); }
+.field input, .field select, .field textarea, .inp, textarea.note-box { background: var(--surface); border-color: var(--line); }
+.field input:focus, .field select:focus, .field textarea:focus, .inp:focus { border-color: var(--ink); }
+/* the front page: a lead story beside the radar plate */
+.hero { border: 0; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); background: var(--bg); }
+.hero .copy h1 em { color: var(--ink); font-style: italic; background: linear-gradient(transparent 60%, var(--salmon) 60%, var(--salmon) 92%, transparent 92%); padding: 0 .06em; }
+.radar-wrap { background: var(--surface); border-left: 1px solid var(--line); }
+.radar-legend { background: var(--surface); }
+details.how { background: transparent; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">

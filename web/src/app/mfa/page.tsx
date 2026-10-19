@@ -25,7 +25,8 @@ export default function Mfa() {
     const { error } = await supabaseBrowser().auth.mfa.challengeAndVerify({ factorId, code: code.trim() });
     setBusy(false);
     if (error) return setErr("That code did not work. Codes change every 30 seconds; try the current one.");
-    location.assign("/");
+    // a password reset proves the second factor here, then goes back to set the new password
+    location.assign(new URLSearchParams(location.search).get("next") === "/auth/reset" ? "/auth/reset" : "/");
   }
 
   async function signOut() {

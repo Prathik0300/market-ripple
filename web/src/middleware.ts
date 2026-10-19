@@ -62,6 +62,13 @@ export async function middleware(req: NextRequest) {
     return r;
   };
 
+  // an email link that Supabase sent to the bare Site URL (no allowed redirect): hand it to /auth/confirm
+  if (path === "/" && (req.nextUrl.searchParams.has("code") || req.nextUrl.searchParams.has("token_hash"))) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/auth/confirm";
+    return done(NextResponse.redirect(url));
+  }
+
   // getClaims() verifies the token's signature locally against the project's published key (cached), so no request
   // waits on a round trip to Supabase; it refreshes an expired session through the cookies above
   const { data } = await supabase.auth.getClaims();

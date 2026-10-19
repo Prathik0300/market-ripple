@@ -1,0 +1,126 @@
+[
+  {
+    "id": "robinhood",
+    "name": "Robinhood",
+    "url": "https://agent.robinhood.com/mcp/trading",
+    "docs": "https://robinhood.com/us/en/support/",
+    "what": "Your US stock, option and crypto positions, portfolio value and order history",
+    "why": "Robinhood doesn't offer an open API to other apps. Its official connector is the supported way in.",
+    "auth": "You sign in on Robinhood's own page; Market Ripple never sees your password.",
+    "ripple": true,
+    "read": [
+      "get_accounts",
+      "get_portfolio",
+      "get_equity_positions",
+      "get_crypto_positions",
+      "get_option_positions",
+      "get_equity_orders",
+      "get_crypto_orders",
+      "get_option_orders",
+      "get_watchlists",
+      "get_watchlist_items",
+      "get_equity_quotes",
+      "get_crypto_quotes",
+      "get_earnings_calendar",
+      "get_equity_fundamentals"
+    ],
+    "pulls": [
+      {
+        "tool": "get_portfolio",
+        "label": "portfolio value"
+      },
+      {
+        "tool": "get_equity_positions",
+        "label": "stock positions"
+      },
+      {
+        "tool": "get_crypto_positions",
+        "label": "crypto positions"
+      },
+      {
+        "tool": "get_option_positions",
+        "label": "option positions"
+      }
+    ],
+    "caution": "Robinhood's connector can also place orders. Market Ripple never uses those tools. In your AI app, set them to ask every time or turn them off."
+  },
+  {
+    "id": "financialdatasets",
+    "name": "Financial Datasets",
+    "url": "https://mcp.financialdatasets.ai/",
+    "docs": "https://docs.financialdatasets.ai/mcp-server",
+    "what": "US company financials, filings, insider trades, institutional holdings, news and macro data",
+    "why": "Its API needs a paid key; the connector works with your Financial Datasets account instead.",
+    "auth": "You sign in on Financial Datasets' own page.",
+    "ripple": true,
+    "read": [
+      "get_news",
+      "get_filings",
+      "get_filing_items",
+      "get_insider_trades",
+      "get_institutional_holdings",
+      "get_company_facts",
+      "get_earnings",
+      "get_financial_metrics_snapshot",
+      "get_stock_price",
+      "get_interest_rates",
+      "get_macro_data"
+    ],
+    "pulls": [
+      {
+        "tool": "get_interest_rates",
+        "label": "central bank rates"
+      }
+    ]
+  },
+  {
+    "id": "lunarcrush",
+    "name": "LunarCrush",
+    "url": "https://lunarcrush.ai/mcp",
+    "docs": "https://lunarcrush.com/developers/api/ai",
+    "what": "Social media activity and sentiment for crypto and stocks",
+    "why": "Its API is paid per key; the connector works with your LunarCrush account.",
+    "auth": "You sign in on LunarCrush's own page, with read-only access.",
+    "ripple": true,
+    "scope": "profile api.read",
+    "read": [
+      "list",
+      "topic",
+      "topic_time_series",
+      "topic_posts",
+      "keyword_time_series",
+      "keyword_posts",
+      "creator",
+      "creator_posts",
+      "creator_time_series",
+      "post",
+      "cryptocurrencies",
+      "stocks",
+      "search",
+      "fetch"
+    ],
+    "pulls": [
+      {
+        "tool": "cryptocurrencies",
+        "label": "crypto social ranking"
+      },
+      {
+        "tool": "stocks",
+        "label": "stock social ranking"
+      }
+    ]
+  },
+  {
+    "id": "bigdata",
+    "name": "Bigdata.com",
+    "url": "https://mcp.bigdata.com/",
+    "docs": "https://bigdata.com/",
+    "what": "Cited financial news, earnings call transcripts, SEC filings and company tearsheets",
+    "why": "News and transcripts aren't on an open API; the connector brings them into your AI app.",
+    "auth": "You sign in on Bigdata.com's own page from your AI app.",
+    "ripple": false,
+    "rippleNote": "Bigdata.com lets AI apps sign in but not other services yet, so it can't sync to Market Ripple. Use it in your AI app.",
+    "read": [],
+    "pulls": []
+  }
+]

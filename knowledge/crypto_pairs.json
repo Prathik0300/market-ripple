@@ -1,0 +1,128 @@
+{
+ "UNI": {
+  "id": "33316259-af8c-4f31-86a4-c5c07e12d625",
+  "symbol": "UNI-USD",
+  "name": "Uniswap",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "LINK": {
+  "id": "9f0a3a2e-e72e-4361-bf15-91d962487922",
+  "symbol": "LINK-USD",
+  "name": "Chainlink",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "SHIB": {
+  "id": "2d189ddb-bc0d-4aa4-bd6b-cd72e6679cd0",
+  "symbol": "SHIB-USD",
+  "name": "Shiba Inu",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "DOT": {
+  "id": "8f8e9726-2a4e-4d7b-b620-fd3c459e7d57",
+  "symbol": "DOT-USD",
+  "name": "Polkadot",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "AVAX": {
+  "id": "f62a25b6-31c0-4c92-846d-3c8105627b62",
+  "symbol": "AVAX-USD",
+  "name": "Avalanche",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "SOL": {
+  "id": "0cdc8c93-fbda-462f-94b7-26353d87a009",
+  "symbol": "SOL-USD",
+  "name": "Solana",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "ADA": {
+  "id": "6f2afc32-702e-41ad-b232-ed26b77c1943",
+  "symbol": "ADA-USD",
+  "name": "Cardano",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "XLM": {
+  "id": "7a04fe7a-e3a8-4a07-8c35-d0fec9f35569",
+  "symbol": "XLM-USD",
+  "name": "Stellar Lumens",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "XRP": {
+  "id": "5f1325b6-f63c-4367-9d6f-713e3a0c5d76",
+  "symbol": "XRP-USD",
+  "name": "XRP",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "LTC": {
+  "id": "383280b1-ff53-43fc-9c84-f01afd0989cd",
+  "symbol": "LTC-USD",
+  "name": "Litecoin",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "DOGE": {
+  "id": "1ef78e1b-049b-4f12-90e5-555dcf2fe204",
+  "symbol": "DOGE-USD",
+  "name": "Dogecoin",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "BCH": {
+  "id": "2f2b77c4-e426-4271-ae49-18d5cb296d3a",
+  "symbol": "BCH-USD",
+  "name": "Bitcoin Cash",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "ETH": {
+  "id": "76637d50-c702-4ed1-bcb5-5b0732a81f48",
+  "symbol": "ETH-USD",
+  "name": "Ethereum",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ },
+ "BTC": {
+  "id": "3d961844-d360-45fc-989b-f6fca761d511",
+  "symbol": "BTC-USD",
+  "name": "Bitcoin",
+  "halted": false,
+  "halted_regions": null,
+  "tradability": "tradable",
+  "display_only": false
+ }
+}

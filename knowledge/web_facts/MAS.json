@@ -1,0 +1,25 @@
+{
+ "key": "MAS",
+ "facts": [
+  {
+   "title": "MAS latest news",
+   "url": "https://www.optionsanalysissuite.com/stocks/mas/news",
+   "source": "Options Analysis Suite",
+   "published": "2026-05-15",
+   "takeaway": "Masco announced a $300 million accelerated share repurchase on May 7, 2026, and its shares fell 4.6% to about $65 on May 15.",
+   "found": "2026-10-19"
+  },
+  {
+   "title": "Masco up after upbeat first-quarter results",
+   "url": "https://www.stockopedia.com/share-prices/masco-NYQ:MAS/news/masco-up-after-upbeat-first-quarter-results-019e6a1e-85ea-7164-88dd-84ae704a23c4/",
+   "source": "Stockopedia / Reuters",
+   "published": "2026",
+   "takeaway": "Masco's Q1 2026 sales of $1.92 billion beat the roughly $1.84 billion expected, and it reaffirmed 2026 adjusted EPS guidance of $4.10 to $4.30.",
+   "found": "2026-10-17"
+  }
+ ],
+ "searched": [
+  "2026-10-17",
+  "2026-10-19"
+ ]
+}

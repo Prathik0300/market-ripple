@@ -1,0 +1,23 @@
+[
+  {
+    "id": "testlocal",
+    "name": "Local test server",
+    "url": "http://127.0.0.1:8799/mcp",
+    "docs": "",
+    "what": "Pretend broker for testing the connect and sync flow",
+    "why": "Development only. It shows how a real server is signed in to and read.",
+    "auth": "Auto-approved sign-in page on 127.0.0.1.",
+    "ripple": true,
+    "read": [
+      "get_positions",
+      "get_quote"
+    ],
+    "pulls": [
+      {
+        "tool": "get_positions",
+        "label": "positions"
+      }
+    ],
+    "caution": "It also offers place_order, which Market Ripple refuses."
+  }
+]

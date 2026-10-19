@@ -1,0 +1,32 @@
+{
+ "key": "TSM",
+ "facts": [
+  {
+   "title": "TSMC September 2026 Revenue Report",
+   "url": "https://pr.tsmc.com/english/news/3343",
+   "source": "TSMC",
+   "published": "2026-10",
+   "takeaway": "September revenue was NT$511.86 billion, down 0.6% from August and up 54.6% from a year earlier; year-to-date revenue is up 41.1%.",
+   "found": "2026-10-17"
+  },
+  {
+   "title": "TSMC stock falls 2 days before earnings on a memory scare it doesn't face",
+   "url": "https://www.tikr.com/ja/blog/tsmc-stock-falls-2-days-before-earnings-on-a-memory-scare-it-doesnt-face",
+   "source": "TIKR",
+   "published": "2026-10-13",
+   "takeaway": "TSMC fell with an Asian chip selloff after a DRAM claim by China's CXMT hit SK Hynix (about -9%); TSMC does not make DRAM.",
+   "found": "2026-10-17"
+  },
+  {
+   "title": "Dear Taiwan Semi Stock Fans, Mark Your Calendars for October 15",
+   "url": "https://www.webull.com/news/15725158852928512",
+   "source": "Webull",
+   "published": "2026-10",
+   "takeaway": "Third-quarter results were due on 15 Oct after the US close; Wall Street expected about $4.45 a share per ADR on roughly $45.4 billion of revenue.",
+   "found": "2026-10-17"
+  }
+ ],
+ "searched": [
+  "2026-10-17"
+ ]
+}

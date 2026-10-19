@@ -1,0 +1,32 @@
+# This repository is public. Never commit keys, statements or the owner's own holdings.
+secrets/
+inbox/
+*.pem
+.env*
+!.env.example
+
+# the owner's private portfolio, watchlists and broker data
+knowledge/brokers/
+knowledge/portfolio.json
+knowledge/portfolio_report.json
+knowledge/portfolio_report.md
+knowledge/watchlists.jsonl
+knowledge/watchlist_settings.json
+knowledge/*.backup*.jsonl
+
+# downloaded caches and run output (rebuilt by the pipeline)
+data/
+out/
+
+# tooling
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/settings.json
+.claude/settings.local.json
+node_modules/
+.next/
+.next-alt/
+.vercel/
+*.tsbuildinfo

@@ -1,0 +1,33 @@
+{
+ "key": "TMPV.NS",
+ "facts": [
+  {
+   "title": "Tata Motors Passenger Vehicles (TMPV:NSE)",
+   "url": "https://www.google.com/finance/labs/quote/TMPV:NSE",
+   "source": "Google Finance",
+   "published": "2026-10-09",
+   "takeaway": "TMPV traded at Rs 278.85 on October 9, 2026, near the bottom of its Rs 272.20 to Rs 419 52-week range; Q1 FY27 EPS was Rs 4.50 versus a Rs 3.80 estimate.",
+   "found": "2026-10-19"
+  },
+  {
+   "title": "Tata Motors Passenger Vehicles Ltd",
+   "url": "https://it.tradingview.com/symbols/NSE-TMPV/",
+   "source": "TradingView",
+   "published": "2026",
+   "takeaway": "The next earnings report is due on November 4, 2026.",
+   "found": "2026-10-19"
+  },
+  {
+   "title": "Tata Motors Passenger Vehicles (TMPV:NSE) quote",
+   "url": "https://www.google.com/finance/quote/TMPV:NSE?window=MAX",
+   "source": "Google Finance",
+   "published": "2026-10-09",
+   "takeaway": "Q1 FY27 results reported Aug 13, 2026 showed EPS of \u20b94.50 against \u20b93.80 expected; the stock was \u20b9278.85 on Oct 9 near its 52-week low of \u20b9272.20.",
+   "found": "2026-10-18"
+  }
+ ],
+ "searched": [
+  "2026-10-18",
+  "2026-10-19"
+ ]
+}

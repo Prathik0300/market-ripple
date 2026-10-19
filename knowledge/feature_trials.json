@@ -1,0 +1,1300 @@
+{
+ "asof": "2026-10-19",
+ "run": "2026-10-19T20:44:50+00:00",
+ "method": "Same walk-forward test as the model, base and new on identical rows; one verdict per family.",
+ "families": {
+  "sec_fundamentals": {
+   "source": "SEC EDGAR XBRL company facts (data.sec.gov)",
+   "what": "earnings yield, revenue growth, post-filing drift, days since the last 10-Q/10-K",
+   "verdict": "drop",
+   "rule": "keep only if pooled Brier skill rises at both horizons and block bootstrap P(better) >= 0.8",
+   "summary": {
+    "h5": {
+     "targets": 25,
+     "oos_n": 53645,
+     "skill_base": -0.034,
+     "skill_new": -0.0589,
+     "auc_base": 0.511,
+     "auc_new": 0.508,
+     "gain": -0.0249,
+     "targets_helped": 1,
+     "median_gain": -0.025,
+     "p_better": 0.0
+    },
+    "h20": {
+     "targets": 25,
+     "oos_n": 53270,
+     "skill_base": -0.0753,
+     "skill_new": -0.1313,
+     "auc_base": 0.521,
+     "auc_new": 0.515,
+     "gain": -0.056,
+     "targets_helped": 3,
+     "median_gain": -0.0517,
+     "p_better": 0.0
+    }
+   },
+   "targets": [
+    {
+     "node": "airlines",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2709,
+      "skill_base": -0.048,
+      "skill_new": -0.0947,
+      "auc_base": 0.492,
+      "auc_new": 0.5,
+      "gain": -0.0467
+     },
+     "h20": {
+      "n": 2694,
+      "skill_base": -0.0925,
+      "skill_new": -0.1622,
+      "auc_base": 0.524,
+      "auc_new": 0.502,
+      "gain": -0.0697
+     }
+    },
+    {
+     "node": "tankers",
+     "features": [
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 1198,
+      "skill_base": -0.0752,
+      "skill_new": -0.0986,
+      "auc_base": 0.493,
+      "auc_new": 0.487,
+      "gain": -0.0234
+     },
+     "h20": {
+      "n": 1183,
+      "skill_base": -0.1298,
+      "skill_new": -0.1858,
+      "auc_base": 0.522,
+      "auc_new": 0.494,
+      "gain": -0.056
+     }
+    },
+    {
+     "node": "container",
+     "features": [
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 195,
+      "skill_base": -0.1201,
+      "skill_new": -0.1422,
+      "auc_base": 0.477,
+      "auc_new": 0.45,
+      "gain": -0.0221
+     },
+     "h20": {
+      "n": 180,
+      "skill_base": -0.0812,
+      "skill_new": -0.1726,
+      "auc_base": 0.447,
+      "auc_new": 0.325,
+      "gain": -0.0914
+     }
+    },
+    {
+     "node": "defense",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0367,
+      "skill_new": -0.0412,
+      "auc_base": 0.476,
+      "auc_new": 0.514,
+      "gain": -0.0045
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.0678,
+      "skill_new": -0.0613,
+      "auc_base": 0.496,
+      "auc_new": 0.521,
+      "gain": 0.0065
+     }
+    },
+    {
+     "node": "gold_miners",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 947,
+      "skill_base": -0.0285,
+      "skill_new": -0.0681,
+      "auc_base": 0.465,
+      "auc_new": 0.481,
+      "gain": -0.0396
+     },
+     "h20": {
+      "n": 932,
+      "skill_base": -0.1679,
+      "skill_new": -0.2112,
+      "auc_base": 0.382,
+      "auc_new": 0.493,
+      "gain": -0.0433
+     }
+    },
+    {
+     "node": "copper_miners",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 1955,
+      "skill_base": -0.0342,
+      "skill_new": -0.0707,
+      "auc_base": 0.521,
+      "auc_new": 0.512,
+      "gain": -0.0365
+     },
+     "h20": {
+      "n": 1940,
+      "skill_base": -0.0711,
+      "skill_new": -0.1353,
+      "auc_base": 0.51,
+      "auc_new": 0.519,
+      "gain": -0.0642
+     }
+    },
+    {
+     "node": "alu_producers",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 1198,
+      "skill_base": -0.0269,
+      "skill_new": -0.0504,
+      "auc_base": 0.487,
+      "auc_new": 0.477,
+      "gain": -0.0235
+     },
+     "h20": {
+      "n": 1183,
+      "skill_base": -0.0103,
+      "skill_new": -0.0177,
+      "auc_base": 0.577,
+      "auc_new": 0.566,
+      "gain": -0.0074
+     }
+    },
+    {
+     "node": "beverages",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 697,
+      "skill_base": -0.0507,
+      "skill_new": -0.0315,
+      "auc_base": 0.457,
+      "auc_new": 0.493,
+      "gain": 0.0192
+     },
+     "h20": {
+      "n": 682,
+      "skill_base": -0.1018,
+      "skill_new": -0.0923,
+      "auc_base": 0.499,
+      "auc_new": 0.517,
+      "gain": 0.0095
+     }
+    },
+    {
+     "node": "fertilizer",
+     "features": [
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 947,
+      "skill_base": -0.0077,
+      "skill_new": -0.0189,
+      "auc_base": 0.544,
+      "auc_new": 0.534,
+      "gain": -0.0112
+     },
+     "h20": {
+      "n": 932,
+      "skill_base": -0.007,
+      "skill_new": -0.0265,
+      "auc_base": 0.559,
+      "auc_new": 0.547,
+      "gain": -0.0195
+     }
+    },
+    {
+     "node": "lng_export",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 947,
+      "skill_base": -0.0186,
+      "skill_new": -0.0502,
+      "auc_base": 0.494,
+      "auc_new": 0.479,
+      "gain": -0.0316
+     },
+     "h20": {
+      "n": 932,
+      "skill_base": -0.0345,
+      "skill_new": -0.0743,
+      "auc_base": 0.497,
+      "auc_new": 0.496,
+      "gain": -0.0398
+     }
+    },
+    {
+     "node": "uranium_miners",
+     "features": [
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0029,
+      "skill_new": -0.0055,
+      "auc_base": 0.516,
+      "auc_new": 0.512,
+      "gain": -0.0026
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.018,
+      "skill_new": -0.0285,
+      "auc_base": 0.528,
+      "auc_new": 0.512,
+      "gain": -0.0105
+     }
+    },
+    {
+     "node": "lithium_miners",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2709,
+      "skill_base": -0.0503,
+      "skill_new": -0.0949,
+      "auc_base": 0.521,
+      "auc_new": 0.513,
+      "gain": -0.0446
+     },
+     "h20": {
+      "n": 2694,
+      "skill_base": -0.1247,
+      "skill_new": -0.2278,
+      "auc_base": 0.524,
+      "auc_new": 0.5,
+      "gain": -0.1031
+     }
+    },
+    {
+     "node": "re_miners",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 195,
+      "skill_base": 0.0134,
+      "skill_new": -0.0281,
+      "auc_base": 0.611,
+      "auc_new": 0.592,
+      "gain": -0.0415
+     },
+     "h20": {
+      "n": 180,
+      "skill_base": -0.13,
+      "skill_new": -0.2009,
+      "auc_base": 0.534,
+      "auc_new": 0.621,
+      "gain": -0.0709
+     }
+    },
+    {
+     "node": "ai_chips",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0326,
+      "skill_new": -0.0822,
+      "auc_base": 0.496,
+      "auc_new": 0.513,
+      "gain": -0.0496
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.0516,
+      "skill_new": -0.2744,
+      "auc_base": 0.505,
+      "auc_new": 0.55,
+      "gain": -0.2228
+     }
+    },
+    {
+     "node": "memory",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0216,
+      "skill_new": -0.0334,
+      "auc_base": 0.519,
+      "auc_new": 0.517,
+      "gain": -0.0118
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.0678,
+      "skill_new": -0.0998,
+      "auc_base": 0.502,
+      "auc_new": 0.518,
+      "gain": -0.032
+     }
+    },
+    {
+     "node": "hyperscalers",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0264,
+      "skill_new": -0.0611,
+      "auc_base": 0.519,
+      "auc_new": 0.503,
+      "gain": -0.0347
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.1381,
+      "skill_new": -0.2396,
+      "auc_base": 0.483,
+      "auc_new": 0.46,
+      "gain": -0.1015
+     }
+    },
+    {
+     "node": "devices",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0257,
+      "skill_new": -0.0531,
+      "auc_base": 0.482,
+      "auc_new": 0.471,
+      "gain": -0.0274
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0737,
+      "skill_new": -0.1262,
+      "auc_base": 0.494,
+      "auc_new": 0.475,
+      "gain": -0.0525
+     }
+    },
+    {
+     "node": "autos",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2709,
+      "skill_base": -0.0563,
+      "skill_new": -0.0876,
+      "auc_base": 0.484,
+      "auc_new": 0.493,
+      "gain": -0.0313
+     },
+     "h20": {
+      "n": 2694,
+      "skill_base": -0.0976,
+      "skill_new": -0.1742,
+      "auc_base": 0.468,
+      "auc_new": 0.463,
+      "gain": -0.0766
+     }
+    },
+    {
+     "node": "chocolate",
+     "features": [
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.043,
+      "skill_new": -0.0762,
+      "auc_base": 0.508,
+      "auc_new": 0.497,
+      "gain": -0.0332
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.0666,
+      "skill_new": -0.178,
+      "auc_base": 0.537,
+      "auc_new": 0.486,
+      "gain": -0.1114
+     }
+    },
+    {
+     "node": "industrial_gas",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0377,
+      "skill_new": -0.062,
+      "auc_base": 0.507,
+      "auc_new": 0.501,
+      "gain": -0.0243
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0622,
+      "skill_new": -0.1139,
+      "auc_base": 0.515,
+      "auc_new": 0.512,
+      "gain": -0.0517
+     }
+    },
+    {
+     "node": "homebuilders",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0485,
+      "skill_new": -0.0633,
+      "auc_base": 0.497,
+      "auc_new": 0.492,
+      "gain": -0.0148
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.101,
+      "skill_new": -0.1492,
+      "auc_base": 0.498,
+      "auc_new": 0.482,
+      "gain": -0.0482
+     }
+    },
+    {
+     "node": "crypto_stocks",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 195,
+      "skill_base": 0.005,
+      "skill_new": -0.02,
+      "auc_base": 0.562,
+      "auc_new": 0.615,
+      "gain": -0.025
+     },
+     "h20": {
+      "n": 180,
+      "skill_base": -0.2684,
+      "skill_new": -0.3763,
+      "auc_base": 0.404,
+      "auc_new": 0.393,
+      "gain": -0.1079
+     }
+    },
+    {
+     "node": "coffee_chains",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0274,
+      "skill_new": -0.0323,
+      "auc_base": 0.536,
+      "auc_new": 0.548,
+      "gain": -0.0049
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.065,
+      "skill_new": -0.059,
+      "auc_base": 0.569,
+      "auc_new": 0.603,
+      "gain": 0.006
+     }
+    },
+    {
+     "node": "ag_traders",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0332,
+      "skill_new": -0.0636,
+      "auc_base": 0.5,
+      "auc_new": 0.5,
+      "gain": -0.0304
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0724,
+      "skill_new": -0.0996,
+      "auc_base": 0.457,
+      "auc_new": 0.511,
+      "gain": -0.0272
+     }
+    },
+    {
+     "node": "steel_cos",
+     "features": [
+      "sec_ey",
+      "sec_rev_yoy",
+      "sec_age",
+      "sec_pead"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0256,
+      "skill_new": -0.0455,
+      "auc_base": 0.527,
+      "auc_new": 0.529,
+      "gain": -0.0199
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.0348,
+      "skill_new": -0.0562,
+      "auc_base": 0.569,
+      "auc_new": 0.577,
+      "gain": -0.0214
+     }
+    }
+   ]
+  },
+  "sec_filings": {
+   "source": "SEC EDGAR submissions (data.sec.gov)",
+   "what": "8-K count in 30 days, insider Form 4 count in 90 days",
+   "verdict": "drop",
+   "rule": "keep only if pooled Brier skill rises at both horizons and block bootstrap P(better) >= 0.8",
+   "summary": {
+    "h5": {
+     "targets": 25,
+     "oos_n": 65729,
+     "skill_base": -0.0137,
+     "skill_new": -0.0182,
+     "auc_base": 0.519,
+     "auc_new": 0.515,
+     "gain": -0.0045,
+     "targets_helped": 3,
+     "median_gain": -0.0028,
+     "p_better": 0.0
+    },
+    "h20": {
+     "targets": 25,
+     "oos_n": 65103,
+     "skill_base": -0.0331,
+     "skill_new": -0.0459,
+     "auc_base": 0.527,
+     "auc_new": 0.522,
+     "gain": -0.0128,
+     "targets_helped": 1,
+     "median_gain": -0.0077,
+     "p_better": 0.0
+    }
+   },
+   "targets": [
+    {
+     "node": "airlines",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0079,
+      "skill_new": -0.0101,
+      "auc_base": 0.508,
+      "auc_new": 0.51,
+      "gain": -0.0022
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0268,
+      "skill_new": -0.0356,
+      "auc_base": 0.492,
+      "auc_new": 0.5,
+      "gain": -0.0088
+     }
+    },
+    {
+     "node": "tankers",
+     "features": [
+      "sec_8k30"
+     ],
+     "h5": {
+      "n": 1198,
+      "skill_base": -0.0752,
+      "skill_new": -0.0764,
+      "auc_base": 0.493,
+      "auc_new": 0.491,
+      "gain": -0.0012
+     },
+     "h20": {
+      "n": 1183,
+      "skill_base": -0.1298,
+      "skill_new": -0.1396,
+      "auc_base": 0.522,
+      "auc_new": 0.515,
+      "gain": -0.0098
+     }
+    },
+    {
+     "node": "container",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 195,
+      "skill_base": -0.1201,
+      "skill_new": -0.1147,
+      "auc_base": 0.477,
+      "auc_new": 0.52,
+      "gain": 0.0054
+     },
+     "h20": {
+      "n": 180,
+      "skill_base": -0.0812,
+      "skill_new": -0.0927,
+      "auc_base": 0.447,
+      "auc_new": 0.496,
+      "gain": -0.0115
+     }
+    },
+    {
+     "node": "defense",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0065,
+      "skill_new": -0.008,
+      "auc_base": 0.528,
+      "auc_new": 0.523,
+      "gain": -0.0015
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": 0.0046,
+      "skill_new": -0.0003,
+      "auc_base": 0.568,
+      "auc_new": 0.564,
+      "gain": -0.0049
+     }
+    },
+    {
+     "node": "gold_miners",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0204,
+      "skill_new": -0.0221,
+      "auc_base": 0.51,
+      "auc_new": 0.505,
+      "gain": -0.0017
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0776,
+      "skill_new": -0.0842,
+      "auc_base": 0.501,
+      "auc_new": 0.491,
+      "gain": -0.0066
+     }
+    },
+    {
+     "node": "copper_miners",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.008,
+      "skill_new": -0.0141,
+      "auc_base": 0.501,
+      "auc_new": 0.499,
+      "gain": -0.0061
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0004,
+      "skill_new": -0.0305,
+      "auc_base": 0.539,
+      "auc_new": 0.53,
+      "gain": -0.0301
+     }
+    },
+    {
+     "node": "alu_producers",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 1703,
+      "skill_base": -0.0481,
+      "skill_new": -0.0699,
+      "auc_base": 0.489,
+      "auc_new": 0.471,
+      "gain": -0.0218
+     },
+     "h20": {
+      "n": 1688,
+      "skill_base": -0.1077,
+      "skill_new": -0.1616,
+      "auc_base": 0.49,
+      "auc_new": 0.466,
+      "gain": -0.0539
+     }
+    },
+    {
+     "node": "beverages",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.004,
+      "skill_new": -0.0072,
+      "auc_base": 0.54,
+      "auc_new": 0.54,
+      "gain": -0.0032
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": 0.0037,
+      "skill_new": -0.0019,
+      "auc_base": 0.577,
+      "auc_new": 0.578,
+      "gain": -0.0056
+     }
+    },
+    {
+     "node": "fertilizer",
+     "features": [
+      "sec_8k30"
+     ],
+     "h5": {
+      "n": 1198,
+      "skill_base": -0.0503,
+      "skill_new": -0.0561,
+      "auc_base": 0.512,
+      "auc_new": 0.509,
+      "gain": -0.0058
+     },
+     "h20": {
+      "n": 932,
+      "skill_base": -0.005,
+      "skill_new": -0.0077,
+      "auc_base": 0.552,
+      "auc_new": 0.55,
+      "gain": -0.0027
+     }
+    },
+    {
+     "node": "lng_export",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0057,
+      "skill_new": -0.0093,
+      "auc_base": 0.491,
+      "auc_new": 0.488,
+      "gain": -0.0036
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0365,
+      "skill_new": -0.0391,
+      "auc_base": 0.438,
+      "auc_new": 0.465,
+      "gain": -0.0026
+     }
+    },
+    {
+     "node": "uranium_miners",
+     "features": [
+      "sec_8k30"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0029,
+      "skill_new": -0.0039,
+      "auc_base": 0.516,
+      "auc_new": 0.512,
+      "gain": -0.001
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.018,
+      "skill_new": -0.0193,
+      "auc_base": 0.528,
+      "auc_new": 0.529,
+      "gain": -0.0013
+     }
+    },
+    {
+     "node": "lithium_miners",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0161,
+      "skill_new": -0.0216,
+      "auc_base": 0.506,
+      "auc_new": 0.498,
+      "gain": -0.0055
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0442,
+      "skill_new": -0.075,
+      "auc_base": 0.51,
+      "auc_new": 0.477,
+      "gain": -0.0308
+     }
+    },
+    {
+     "node": "re_miners",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 445,
+      "skill_base": -0.1073,
+      "skill_new": -0.1043,
+      "auc_base": 0.507,
+      "auc_new": 0.505,
+      "gain": 0.003
+     },
+     "h20": {
+      "n": 430,
+      "skill_base": -0.2486,
+      "skill_new": -0.2766,
+      "auc_base": 0.414,
+      "auc_new": 0.396,
+      "gain": -0.028
+     }
+    },
+    {
+     "node": "ai_chips",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0036,
+      "skill_new": -0.0056,
+      "auc_base": 0.512,
+      "auc_new": 0.508,
+      "gain": -0.002
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0281,
+      "skill_new": -0.0389,
+      "auc_base": 0.468,
+      "auc_new": 0.472,
+      "gain": -0.0108
+     }
+    },
+    {
+     "node": "memory",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0089,
+      "skill_new": -0.0103,
+      "auc_base": 0.508,
+      "auc_new": 0.512,
+      "gain": -0.0014
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0313,
+      "skill_new": -0.0355,
+      "auc_base": 0.521,
+      "auc_new": 0.524,
+      "gain": -0.0042
+     }
+    },
+    {
+     "node": "hyperscalers",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0152,
+      "skill_new": -0.017,
+      "auc_base": 0.529,
+      "auc_new": 0.523,
+      "gain": -0.0018
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0541,
+      "skill_new": -0.0617,
+      "auc_base": 0.506,
+      "auc_new": 0.496,
+      "gain": -0.0076
+     }
+    },
+    {
+     "node": "devices",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0027,
+      "skill_new": -0.0061,
+      "auc_base": 0.504,
+      "auc_new": 0.5,
+      "gain": -0.0034
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0118,
+      "skill_new": -0.0212,
+      "auc_base": 0.526,
+      "auc_new": 0.525,
+      "gain": -0.0094
+     }
+    },
+    {
+     "node": "autos",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 2961,
+      "skill_base": -0.0397,
+      "skill_new": -0.0525,
+      "auc_base": 0.491,
+      "auc_new": 0.491,
+      "gain": -0.0128
+     },
+     "h20": {
+      "n": 2946,
+      "skill_base": -0.078,
+      "skill_new": -0.1141,
+      "auc_base": 0.487,
+      "auc_new": 0.498,
+      "gain": -0.0361
+     }
+    },
+    {
+     "node": "chocolate",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0069,
+      "skill_new": -0.0172,
+      "auc_base": 0.533,
+      "auc_new": 0.52,
+      "gain": -0.0103
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.018,
+      "skill_new": -0.0257,
+      "auc_base": 0.54,
+      "auc_new": 0.532,
+      "gain": -0.0077
+     }
+    },
+    {
+     "node": "industrial_gas",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0125,
+      "skill_new": -0.0155,
+      "auc_base": 0.504,
+      "auc_new": 0.497,
+      "gain": -0.003
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0255,
+      "skill_new": -0.0296,
+      "auc_base": 0.52,
+      "auc_new": 0.518,
+      "gain": -0.0041
+     }
+    },
+    {
+     "node": "homebuilders",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0048,
+      "skill_new": -0.0076,
+      "auc_base": 0.505,
+      "auc_new": 0.5,
+      "gain": -0.0028
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0182,
+      "skill_new": -0.024,
+      "auc_base": 0.495,
+      "auc_new": 0.48,
+      "gain": -0.0058
+     }
+    },
+    {
+     "node": "crypto_stocks",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 195,
+      "skill_base": 0.005,
+      "skill_new": 0.009,
+      "auc_base": 0.562,
+      "auc_new": 0.568,
+      "gain": 0.004
+     },
+     "h20": {
+      "n": 180,
+      "skill_base": -0.2684,
+      "skill_new": -0.2298,
+      "auc_base": 0.404,
+      "auc_new": 0.43,
+      "gain": 0.0386
+     }
+    },
+    {
+     "node": "coffee_chains",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0006,
+      "skill_new": -0.0016,
+      "auc_base": 0.539,
+      "auc_new": 0.539,
+      "gain": -0.001
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0267,
+      "skill_new": -0.0336,
+      "auc_base": 0.504,
+      "auc_new": 0.501,
+      "gain": -0.0069
+     }
+    },
+    {
+     "node": "ag_traders",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": -0.0239,
+      "skill_new": -0.0284,
+      "auc_base": 0.475,
+      "auc_new": 0.47,
+      "gain": -0.0045
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0276,
+      "skill_new": -0.044,
+      "auc_base": 0.487,
+      "auc_new": 0.491,
+      "gain": -0.0164
+     }
+    },
+    {
+     "node": "steel_cos",
+     "features": [
+      "sec_8k30",
+      "sec_f4_90"
+     ],
+     "h5": {
+      "n": 3213,
+      "skill_base": 0.001,
+      "skill_new": -0.0109,
+      "auc_base": 0.529,
+      "auc_new": 0.528,
+      "gain": -0.0119
+     },
+     "h20": {
+      "n": 3198,
+      "skill_base": -0.0032,
+      "skill_new": -0.0294,
+      "auc_base": 0.529,
+      "auc_new": 0.519,
+      "gain": -0.0262
+     }
+    }
+   ]
+  }
+ },
+ "waiting_for_history": [
+  {
+   "source": "events",
+   "history_days": 19,
+   "first": "2026-10-01",
+   "testable_from": "2030-09-30",
+   "note": "event-pressure features per node; logged since the job started"
+  },
+  {
+   "source": "analyst ratings",
+   "history_days": 4,
+   "first": "2026-10-16",
+   "testable_from": "2030-10-15",
+   "note": "predictor.analyst plans a simpler event study in January 2027"
+  },
+  {
+   "source": "prediction markets",
+   "history_days": 2,
+   "first": null,
+   "testable_from": null,
+   "note": "only 48 h of snapshots are kept"
+  },
+  {
+   "source": "mcp financialdatasets",
+   "history_days": 0,
+   "first": null,
+   "testable_from": null,
+   "note": "no user has connected it yet"
+  },
+  {
+   "source": "mcp lunarcrush",
+   "history_days": 0,
+   "first": null,
+   "testable_from": null,
+   "note": "no user has connected it yet"
+  }
+ ]
+}

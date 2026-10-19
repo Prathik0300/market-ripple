@@ -1,0 +1,6 @@
+# never upload local secrets, test notes, the local database config or build output
+.env*
+TESTING.md
+supabase/
+node_modules/
+.next/

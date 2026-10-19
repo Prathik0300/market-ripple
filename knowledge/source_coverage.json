@@ -1,0 +1,231 @@
+{
+ "asof": "2026-10-19T20:45:08Z",
+ "sources": [
+  {
+   "id": "groww",
+   "group": "broker API",
+   "data": "holdings, trades (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal account data. Stays in that user's own report; never pooled. Groww's market-data calls need a user's own key, which only the cloud sync can open, and the same Indian prices already come from Yahoo (data/prices)."
+  },
+  {
+   "id": "zerodha",
+   "group": "broker API",
+   "data": "holdings, trades (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal account data. Kite market data needs a user's own session; NSE prices already come from Yahoo."
+  },
+  {
+   "id": "upstox",
+   "group": "broker API",
+   "data": "holdings, trades (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal account data. Upstox market data needs a user's own token; NSE prices already come from Yahoo."
+  },
+  {
+   "id": "coindcx",
+   "group": "broker API",
+   "data": "holdings, trades (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal account data. CoinDCX public tickers duplicate the crypto prices already in the model (BTC-USD, ETH-USD)."
+  },
+  {
+   "id": "binance",
+   "group": "broker API",
+   "data": "holdings, trades (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal account data. Binance's public futures data (funding rates) would be a real crypto feature, but fapi.binance.com answers HTTP 451 (restricted location) from this Mac."
+  },
+  {
+   "id": "cams",
+   "group": "statement upload",
+   "data": "mutual fund statement (per user, web/api/cas.py; owner: predictor.mutualfunds)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "Personal statements (PAN, holdings). AMFI NAVs are public, but the funds fetched are the ones held, so NAV facts would reveal holdings; funds are not model targets."
+  },
+  {
+   "id": "robinhood",
+   "group": "MCP connector",
+   "data": "portfolio and positions (per user)",
+   "personal": true,
+   "model": "no",
+   "facts": "no",
+   "why": "The platform pulls only account tools (portfolio, positions). Personal; never pooled."
+  },
+  {
+   "id": "robinhood-owner-research",
+   "group": "MCP (owner's job session)",
+   "data": "analyst ratings, fundamentals snapshot, earnings calendar",
+   "personal": false,
+   "model": "waiting for history (analyst snapshots since 2026-10-16; fundamentals history comes from SEC instead, see sec_fundamentals)",
+   "facts": "yes: analyst_view, fundamentals, earnings_date",
+   "why": ""
+  },
+  {
+   "id": "financialdatasets",
+   "group": "MCP connector",
+   "data": "central bank rates (get_interest_rates)",
+   "personal": false,
+   "model": "waiting for history (collected daily into data/shared_mcp/ once a user connects; US rates already enter via the 10-year yield)",
+   "facts": "yes: interest_rate (from any connected user's pull, numbers only)",
+   "why": ""
+  },
+  {
+   "id": "lunarcrush",
+   "group": "MCP connector",
+   "data": "crypto and stock social rankings",
+   "personal": false,
+   "model": "waiting for history (collected daily into data/shared_mcp/ once a user connects)",
+   "facts": "yes: social_rank (from any connected user's pull, numbers only)",
+   "why": ""
+  },
+  {
+   "id": "bigdata",
+   "group": "MCP connector",
+   "data": "news and filings search",
+   "personal": false,
+   "model": "no",
+   "facts": "no",
+   "why": "Catalog lists it for users' own AI apps only: its server does not let Market Ripple register as a client, so nothing is pulled."
+  },
+  {
+   "id": "prices",
+   "group": "collector",
+   "data": "Yahoo daily closes (predictor.fetch)",
+   "personal": false,
+   "model": "yes (all targets)",
+   "facts": "no",
+   "why": "Prices are model inputs and on the map, not facts."
+  },
+  {
+   "id": "gpr",
+   "group": "collector",
+   "data": "Geopolitical Risk index (data/gpr_daily.csv)",
+   "personal": false,
+   "model": "yes (all targets)",
+   "facts": "no",
+   "why": "A daily index, used as a feature."
+  },
+  {
+   "id": "events",
+   "group": "collector",
+   "data": "reviewed world events (knowledge/events.jsonl)",
+   "personal": false,
+   "model": "waiting for history (log starts 2026-10-01)",
+   "facts": "yes: event",
+   "why": ""
+  },
+  {
+   "id": "primary-sources",
+   "group": "collector",
+   "data": "SEC 8-K/6-K/Form 4, NSE/BSE filings, Federal Register, Fed/BLS/OFAC, RBI/DGFT, NOAA/NWS (predictor.news)",
+   "personal": false,
+   "model": "filing activity tested as sec_filings (EDGAR history); exchange and agency feeds have no history",
+   "facts": "yes: filing, official, weather",
+   "why": ""
+  },
+  {
+   "id": "prediction-markets",
+   "group": "collector",
+   "data": "Polymarket and Kalshi odds moves",
+   "personal": false,
+   "model": "waiting for history (48 h of snapshots kept)",
+   "facts": "yes: market_odds (crowd odds, not facts about the world)",
+   "why": ""
+  },
+  {
+   "id": "headlines",
+   "group": "collector",
+   "data": "Google News topic feeds, publishers, wires",
+   "personal": false,
+   "model": "no",
+   "facts": "no",
+   "why": "Unreviewed headlines; the job reviews them and logs the real ones as events, which are facts."
+  },
+  {
+   "id": "web-facts",
+   "group": "collector",
+   "data": "dossier web searches (predictor.dossier web)",
+   "personal": false,
+   "model": "no",
+   "facts": "yes: web_fact (shared dossier names only)",
+   "why": "Text takeaways with no history to test."
+  },
+  {
+   "id": "sec-edgar",
+   "group": "public API",
+   "data": "XBRL company facts and filing lists (predictor.sec_data)",
+   "personal": false,
+   "model": "trial: sec_fundamentals drop, sec_filings drop",
+   "facts": "yes: reported_quarter",
+   "why": ""
+  }
+ ],
+ "trial_verdicts": {
+  "sec_fundamentals": "drop",
+  "sec_filings": "drop"
+ },
+ "facts_by_pipeline": {
+  "knowledge/events.jsonl (job step 4)": 509,
+  "predictor.analyst (job step 4b)": 125,
+  "predictor.dossier fundamentals (job step 4b)": 30,
+  "predictor.focus earnings (job step 4b)": 940,
+  "predictor.dossier web (job step 4f)": 51,
+  "predictor.news (prediction-markets)": 4,
+  "predictor.news (weather)": 3,
+  "predictor.news (india-official)": 8,
+  "predictor.news (fed-register)": 6,
+  "predictor.news (sec-filings)": 2,
+  "predictor.news (india-filings)": 2,
+  "predictor.sec_data": 24
+ },
+ "waiting_for_history": [
+  {
+   "source": "events",
+   "history_days": 19,
+   "first": "2026-10-01",
+   "testable_from": "2030-09-30",
+   "note": "event-pressure features per node; logged since the job started"
+  },
+  {
+   "source": "analyst ratings",
+   "history_days": 4,
+   "first": "2026-10-16",
+   "testable_from": "2030-10-15",
+   "note": "predictor.analyst plans a simpler event study in January 2027"
+  },
+  {
+   "source": "prediction markets",
+   "history_days": 2,
+   "first": null,
+   "testable_from": null,
+   "note": "only 48 h of snapshots are kept"
+  },
+  {
+   "source": "mcp financialdatasets",
+   "history_days": 0,
+   "first": null,
+   "testable_from": null,
+   "note": "no user has connected it yet"
+  },
+  {
+   "source": "mcp lunarcrush",
+   "history_days": 0,
+   "first": null,
+   "testable_from": null,
+   "note": "no user has connected it yet"
+  }
+ ]
+}

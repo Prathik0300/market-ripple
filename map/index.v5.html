@@ -1,0 +1,1087 @@
+<title>Market Ripple Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a trading-desk worksheet. Shock controls on top, the five-column causal map in the middle, the episode ledger below. */
+:root {
+  --bg: #f2f4f3;
+  --surface: #ffffff;
+  --ink: #12201b;
+  --muted: #586863;
+  --line: #d3dcd8;
+  --chip: #e7edea;
+  --accent: #2148a8;
+  --accent-soft: #e2e9fa;
+  --up: #17773f;
+  --up-soft: #dff1e6;
+  --down: #b2361f;
+  --down-soft: #f7e3de;
+  --edge: #8fa29b;
+  --l0: #7a4cb8; --l1: #2f6fb2; --l2: #a8741a; --l3: #2b8a73; --l4: #b34b7a;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1311; --surface: #151e1b; --ink: #e3ece8; --muted: #8c9d97; --line: #27332f; --chip: #1d2925;
+    --accent: #8aa8ff; --accent-soft: #1c2747; --up: #4fc283; --up-soft: #163223; --down: #f07a62; --down-soft: #3a1d16; --edge: #4f625b;
+    --l0: #b48cf0; --l1: #73a9e8; --l2: #e0ad55; --l3: #5cc4a7; --l4: #e985b2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1311; --surface: #151e1b; --ink: #e3ece8; --muted: #8c9d97; --line: #27332f; --chip: #1d2925;
+  --accent: #8aa8ff; --accent-soft: #1c2747; --up: #4fc283; --up-soft: #163223; --down: #f07a62; --down-soft: #3a1d16; --edge: #4f625b;
+  --l0: #b48cf0; --l1: #73a9e8; --l2: #e0ad55; --l3: #5cc4a7; --l4: #e985b2;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 36px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 4.2vw, 2.9rem); font-weight: 700; line-height: 1.05; }
+h2 { font-size: 1.45rem; font-weight: 600; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+header { display: grid; gap: 12px; max-width: 74ch; }
+header p.lead { font-size: 1.06rem; }
+.note { font-size: 0.86rem; color: var(--muted); border-left: 2px solid var(--line); padding-left: 10px; }
+section { display: grid; gap: 14px; min-width: 0; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Shock controls */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 0.88rem; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.ask { display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.ask form { display: flex; flex-wrap: wrap; gap: 8px; }
+.ask input { flex: 1 1 260px; min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.btn { border: 1px solid var(--accent); background: var(--accent); color: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+.ask-out { display: grid; gap: 8px; font-size: 0.92rem; }
+.ask-out ul { margin: 0; padding-left: 18px; }
+
+.results { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
+.res-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.res-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; }
+.res-col { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.res-col h3 { font-size: 1rem; display: flex; gap: 8px; align-items: center; }
+.res-col.up h3 { color: var(--up); }
+.res-col.down h3 { color: var(--down); }
+.res-item { text-align: left; border: 1px solid transparent; background: var(--bg); border-radius: 8px; padding: 8px 10px; display: grid; gap: 3px; min-width: 0; }
+.res-item:hover { border-color: var(--line); }
+.res-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.res-name { font-weight: 600; }
+.res-str { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
+.bar { height: 4px; background: var(--chip); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; }
+.up .bar i { background: var(--up); }
+.down .bar i { background: var(--down); }
+.res-path { font-size: 0.8rem; color: var(--muted); overflow-wrap: anywhere; }
+.tag { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--chip); color: var(--muted); }
+.tag.mixed { background: var(--accent-soft); color: var(--accent); }
+.tag.ev { background: transparent; border: 1px solid var(--line); }
+.more { justify-self: start; background: none; border: none; color: var(--accent); padding: 4px 0; font-size: 0.88rem; }
+.analogs { display: grid; gap: 6px; font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 12px; }
+.analogs ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+/* Map */
+.map-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 980px) { .map-grid { grid-template-columns: minmax(0, 1fr); } }
+.graph { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; overflow-y: hidden; }
+.graph svg { display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.82rem; color: var(--muted); align-items: center; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.sw { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+.colhead { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--muted); }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1; opacity: 0.16; transition: opacity .15s; }
+.edge.dim { opacity: 0.04; }
+.edge.same { stroke: var(--up); opacity: 0.85; stroke-width: 1.5; }
+.edge.opp { stroke: var(--down); opacity: 0.85; stroke-width: 1.5; }
+.mk-up { fill: var(--up); } .mk-down { fill: var(--down); }
+.node { cursor: pointer; }
+.node rect.box { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.node text { font-family: var(--body); font-size: 12px; fill: var(--ink); }
+.node text.arrow { font-family: var(--mono); font-size: 11px; }
+.node:hover rect.box { stroke: var(--accent); }
+.node.sel rect.box { stroke: var(--accent); stroke-width: 2; }
+.node.faded { opacity: 0.32; }
+.node.nup rect.box { fill: var(--up-soft); stroke: var(--up); }
+.node.ndown rect.box { fill: var(--down-soft); stroke: var(--down); }
+.node.nup text.arrow { fill: var(--up); } .node.ndown text.arrow { fill: var(--down); }
+.node.seed rect.box { stroke-width: 2.5; }
+
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; }
+@media (max-width: 980px) { .detail { position: static; max-height: none; } }
+.detail .inst { font-size: 0.88rem; }
+.detail .inst b { font-weight: 600; }
+.links { display: grid; gap: 6px; }
+.links h4, .detail h4 { margin: 0; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.link { display: grid; gap: 2px; padding: 7px 9px; border-radius: 8px; background: var(--bg); font-size: 0.86rem; text-align: left; border: 1px solid transparent; }
+.link:hover { border-color: var(--line); }
+.link .lt { display: flex; justify-content: space-between; gap: 8px; }
+.link .lt b { font-weight: 600; }
+.sg { font-family: var(--mono); font-size: 0.72rem; white-space: nowrap; }
+.sg.same { color: var(--up); } .sg.opp { color: var(--down); }
+.link .why { color: var(--muted); }
+.ep { font-size: 0.86rem; display: grid; gap: 2px; padding: 6px 0; border-top: 1px solid var(--line); }
+.ep:first-of-type { border-top: none; }
+.ep .d { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.mv.up { color: var(--up); } .mv.down { color: var(--down); }
+.row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty { color: var(--muted); font-size: 0.9rem; }
+
+/* Episodes */
+.filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filter input { flex: 1 1 240px; min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.ledger { display: grid; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.lrow { display: grid; grid-template-columns: 104px minmax(0, 1.1fr) minmax(0, 2fr) 92px; gap: 14px; padding: 12px 16px; border-top: 1px solid var(--line); align-items: start; }
+.lrow:first-child { border-top: none; }
+.lrow.head { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+.lrow .d { font-family: var(--mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.lrow .t { font-weight: 600; }
+.lrow .les { font-size: 0.84rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+.moves { display: grid; gap: 3px; font-size: 0.86rem; }
+.moves button { background: none; border: none; padding: 0; text-align: left; }
+.moves button b { font-weight: 600; }
+.src { font-family: var(--mono); font-size: 0.72rem; }
+.src a { color: var(--accent); }
+@media (max-width: 760px) {
+  .lrow { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .lrow.head { display: none; }
+}
+/* Live desk */
+.live-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .live-grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.panel h4 { margin: 0; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.small { font-size: 0.84rem; }
+.feed { display: grid; }
+.ev { display: grid; gap: 3px; padding: 9px 0; border-top: 1px solid var(--line); min-width: 0; }
+.ev:first-child { border-top: none; padding-top: 0; }
+.ev .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.ev .meta .d { font-family: var(--mono); }
+.ev a { color: var(--ink); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+.ev a:hover { text-decoration: underline; color: var(--accent); }
+.ev .sum { font-size: 0.86rem; color: var(--muted); }
+.ev .nodes { display: flex; flex-wrap: wrap; gap: 6px; }
+.nchip { font-size: 0.78rem; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 1px 8px; }
+.tag.major { background: var(--down-soft); color: var(--down); }
+.tag.notable { background: var(--accent-soft); color: var(--accent); }
+.prow { display: grid; grid-template-columns: minmax(0, 1fr) 120px 44px; gap: 10px; align-items: center; font-size: 0.86rem; background: none; border: none; padding: 3px 0; text-align: left; }
+.pbar { position: relative; height: 8px; background: var(--chip); border-radius: 4px; }
+.pbar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.pbar::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.pv { font-family: var(--mono); font-size: 0.78rem; text-align: right; font-variant-numeric: tabular-nums; }
+.sig-table { overflow-x: auto; }
+.sig-table table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 560px; }
+.sig-table th { text-align: left; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.sig-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sig-table td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sig-table tr:last-child td { border-bottom: none; }
+.sig-table button { background: none; border: none; padding: 0; font-weight: 600; text-align: left; }
+.skill-yes { color: var(--up); font-weight: 600; }
+.measured { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.measured.confirmed { color: var(--up); } .measured.contradicted { color: var(--down); }
+.corr-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .corr-grid { grid-template-columns: minmax(0, 1fr); } }
+.pick, .pick2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pick select, .pick2 select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 0; flex: 1 1 200px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--bg); border-radius: 8px; padding: 10px; display: grid; gap: 2px; }
+.stat .k { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font-family: var(--display); font-size: 1.35rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 0.78rem; color: var(--muted); }
+.verdict { padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); font-size: 0.9rem; }
+.rc text { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+footer { font-size: 0.86rem; color: var(--muted); display: grid; gap: 8px; max-width: 80ch; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { .edge { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Cause-and-effect map &middot; 99 assets and drivers &middot; 205 links &middot; 54 episodes, 1973&ndash;2026</p>
+    <h1>Market Ripple Map</h1>
+    <p class="lead">Pick an event and see which commodities, stocks, funds and coins have historically moved with it, which way, and through which chain of links. Click anything on the map to see what moves it, what it moves, and the past episodes behind each link.</p>
+    <p class="note">Directions come from how these links behaved in past episodes, weighted by how strong each link has been. Real outcomes depend on the size of the shock, its timing and what markets already expect. This is a research aid, not a forecast or investment advice.</p>
+  </header>
+
+  <section id="live" aria-labelledby="live-h">
+    <div class="sec-head"><h2 id="live-h">Live desk</h2><span class="muted small" id="liveStatus">Connecting to the event log&hellip;</span></div>
+    <div class="live-grid">
+      <div class="panel"><h4>Latest world events</h4><div id="feed" class="feed"><p class="empty">The event log appears here once the page is opened in Claude and the two-hourly job has run.</p></div></div>
+      <div class="panel"><h4>Event pressure now</h4><p class="muted small">Recent events passed through the map&rsquo;s links, fading with a three-day half-life. It summarises the news; it is not a forecast.</p><div id="pressure"><p class="empty">No events yet.</p></div><button class="btn ghost" type="button" id="tracePressure" hidden>Trace the last 7 days on the map</button></div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h4>Model check: chance of being higher</h4><span class="muted small" id="modelSummary"></span></div>
+      <p class="muted small">Each probability comes from a model retrained every year and scored only on years it had not seen (2014&ndash;2026). Most assets show no proven skill: their numbers sit close to how often they usually rise. Only rows marked &ldquo;beat naive&rdquo; did better than that in testing.</p>
+      <div id="signals" class="sig-table"><p class="empty">Waiting for the model results.</p></div>
+    </div>
+  </section>
+
+  <section id="screen" aria-labelledby="screen-h">
+    <div class="sec-head"><h2 id="screen-h">Event screener</h2><span class="muted small" id="screenAsof"></span></div>
+    <p class="muted small">Stocks most exposed to the last 14 days of world events. Each event is traced through the map to the factors it moves, then to each stock through its measured exposure to those factors. Use it to narrow down what to research; the scores rank exposure to the news, not future returns, and are not advice.</p>
+    <div class="pick2">
+      <select id="scrGroup" aria-label="Market">
+        <option value="all">All markets</option><option value="uslarge">US large caps (S&amp;P 500)</option><option value="usmid">US mid and small caps (S&amp;P 400, 600)</option>
+        <option value="nasdaq">Other Nasdaq-listed</option><option value="inlarge">India large caps (Nifty 50, Sensex)</option><option value="insmall">India mid, small and micro caps</option><option value="global">Global names</option>
+      </select>
+      <select id="scrSector" aria-label="Sector"><option value="all">All sectors</option></select>
+    </div>
+    <div class="res-cols" id="screenCols"><p class="empty">The screener appears once the page is opened in Claude and stock profiles have been computed.</p></div>
+  </section>
+
+  <section id="portfolio" aria-labelledby="pf-h">
+    <div class="sec-head"><h2 id="pf-h">My portfolio</h2><span class="muted small" id="pfStatus"></span></div>
+    <p class="muted small">Paste your holdings, separated by commas or new lines. A number after a ticker is read as its weight in any unit (value, shares times price, or a percentage); leave numbers out for equal weights. Indian tickers work without &ldquo;.NS&rdquo;. Your list is saved privately: only you can see it. This shows exposure to current news so you can decide what to research; it does not say what to buy or sell.</p>
+    <div class="panel">
+      <label for="pfInput" class="eyebrow">Holdings</label>
+      <textarea id="pfInput" rows="3" placeholder="AAPL 20, MSFT 10, HINDALCO 50, TCS, GLD" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical;min-width:0"></textarea>
+      <div class="row-btns"><button class="btn" type="button" id="pfSave">Save and analyse</button><button class="btn ghost" type="button" id="pfClear">Clear</button></div>
+    </div>
+    <div id="pfOut"></div>
+  </section>
+
+  <section id="corr" aria-labelledby="corr-h">
+    <div class="sec-head"><h2 id="corr-h">Correlation explorer</h2><span class="muted small" id="corrAsof"></span></div>
+    <p class="muted small" id="corrLead">Correlation results appear here once the page is opened in Claude.</p>
+    <div class="corr-grid">
+      <div class="panel">
+        <div class="pick">
+          <label for="pairSel" class="eyebrow">Tested pair</label>
+          <select id="pairSel"></select>
+        </div>
+        <div id="pairCard"><p class="empty">Waiting for the correlation results.</p></div>
+      </div>
+      <div class="panel">
+        <h4>Any two assets</h4>
+        <div class="pick2">
+          <select id="anyA" aria-label="First asset"></select>
+          <select id="anyB" aria-label="Second asset"></select>
+        </div>
+        <p id="anyOut" class="small"></p>
+        <h4 style="margin-top:6px">Strongest links after removing the S&amp;P 500</h4>
+        <div id="topPairs" class="sig-table"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stocks" aria-labelledby="stocks-h">
+    <div class="sec-head"><h2 id="stocks-h">Stock lookup</h2><span class="muted small" id="stocksAsof"></span></div>
+    <p class="muted small" id="stocksLead">Stock profiles appear here once the page is opened in Claude.</p>
+    <div class="pick">
+      <label for="stockQ" class="eyebrow">Ticker or company</label>
+      <input id="stockQ" list="stockList" type="search" autocomplete="off" placeholder="Try XOM, Hershey, HINDALCO.NS, Delta" style="flex:1 1 260px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)">
+      <datalist id="stockList"></datalist>
+    </div>
+    <div class="corr-grid">
+      <div class="panel" id="stockCard"><p class="empty">Search for a stock to see what moves it beyond its market and sector.</p></div>
+      <div class="panel">
+        <h4>Most exposed to a factor</h4>
+        <select id="factorSel" aria-label="Factor" style="font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"></select>
+        <div id="factorList" class="sig-table"></div>
+        <h4 style="margin-top:8px">Strongest hidden exposures</h4>
+        <div id="hiddenList" class="sig-table"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sim" aria-labelledby="sim-h">
+    <div class="sec-head"><h2 id="sim-h">Run a shock</h2><span class="muted" style="font-size:.88rem">Or use &ldquo;Run as shock&rdquo; on any item in the map</span></div>
+    <div class="chips" id="presets" role="group" aria-label="Preset shocks"></div>
+    <div class="ask" id="ask" hidden>
+      <p><b>Map any event with Claude.</b> <span class="muted">Describe something that happened or might happen. Claude picks where it hits first; the map traces the rest.</span></p>
+      <form id="askForm">
+        <label for="askInput" class="eyebrow" style="flex-basis:100%">Event</label>
+        <input id="askInput" type="text" maxlength="300" value="Indonesia bans bauxite exports and Guinea's mines are hit by a coup" autocomplete="off">
+        <button class="btn" id="askBtn" type="submit">Map it</button>
+        <button class="btn ghost" id="askStop" type="button" hidden>Stop</button>
+      </form>
+      <div class="ask-out" id="askOut" aria-live="polite"></div>
+    </div>
+    <div class="results" id="results" aria-live="polite"></div>
+  </section>
+
+  <section id="map" aria-labelledby="map-h">
+    <div class="sec-head"><h2 id="map-h">The map</h2>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--up)"></i>moves the same way</span>
+        <span><i class="sw" style="background:var(--down)"></i>moves the opposite way</span>
+        <span><i class="sw" style="background:var(--l0)"></i>shock</span>
+        <span><i class="sw" style="background:var(--l1)"></i>macro</span>
+        <span><i class="sw" style="background:var(--l2)"></i>commodity</span>
+        <span><i class="sw" style="background:var(--l3)"></i>company</span>
+        <span><i class="sw" style="background:var(--l4)"></i>fund or coin</span>
+      </div>
+    </div>
+    <div class="map-grid">
+      <div class="graph" id="graph"></div>
+      <aside class="detail" id="detail" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section id="history" aria-labelledby="hist-h">
+    <div class="sec-head"><h2 id="hist-h">Episode library</h2><span class="muted" style="font-size:.88rem" id="histCount"></span></div>
+    <div class="filter">
+      <label for="q" class="eyebrow">Search</label>
+      <input id="q" type="search" placeholder="Try oil, India, tariff, bitcoin, 2022" autocomplete="off">
+      <button class="chip" id="clearNode" type="button" hidden></button>
+    </div>
+    <div class="ledger" id="ledger"></div>
+  </section>
+
+  <footer>
+    <p><b>How the map works.</b> Each link has a sign (same or opposite direction), a weight from 0 to 1 and a typical lag. A shock is passed along up to four links; each hop multiplies the weights and loses 15%. Where two paths disagree (oil pushes gold up through inflation but down through higher yields) the item is flagged as mixed.</p>
+    <p><b>Measured links and the live desk.</b> A local pipeline downloads about 21 years of daily prices for 73 market series plus the daily Geopolitical Risk index. For each link it finds days when the source moved more than two standard deviations and checks the target over the next 5 and 20 trading days against the target&rsquo;s own base rate. &ldquo;Link exists&rdquo; includes the shock day; &ldquo;predicts&rdquo; starts the day after, which is what you could act on. A job every two hours logs new world events and refreshes these numbers.</p>
+    <p><b>Sources.</b> 2026 episodes link to the reporting used in the October 2026 research. Earlier episodes are marked &ldquo;approx.&rdquo;: figures are rounded from the historical record and worth checking before you rely on them. Data as of 14 October 2026.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const R = window.RIPPLE;
+  const LAYERS = ['Shocks & decisions', 'Macro & money', 'Commodities', 'Companies & sectors', 'Funds, ETFs & crypto'];
+  const LAYER_SHORT = ['shock', 'macro', 'commodity', 'company', 'fund'];
+  const NODES = R.nodes.map(([id, layer, label, inst, desc]) => ({ id, layer, label, inst, desc }));
+  const BY = Object.fromEntries(NODES.map(n => [n.id, n]));
+  const EDGES = R.edges.map(([s, t, sign, w, lag, why]) => ({ s, t, sign, w, lag, why }));
+  const OUT = {}, IN = {};
+  EDGES.forEach(e => { (OUT[e.s] = OUT[e.s] || []).push(e); (IN[e.t] = IN[e.t] || []).push(e); });
+  const INC = R.incidents.slice().sort((a, b) => b.d.localeCompare(a.d));
+  const $ = s => document.querySelector(s);
+  const el = (tag, attrs, html) => { const x = document.createElement(tag); if (attrs) for (const k in attrs) x.setAttribute(k, attrs[k]); if (html != null) x.innerHTML = html; return x; };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const arrow = d => d > 0 ? '▲' : '▼';
+  const fmtDate = d => { const [y, m, dd] = d.split('-'); const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(m) - 1]; return `${Number(dd)} ${mo} ${y}`; };
+
+  // ---------- evidence ----------
+  function incDirFor(inc, id) {
+    if ((inc.shock || []).includes(id)) return inc.dir || 1;
+    const m = inc.m.find(x => x[0] === id);
+    return m ? m[1] : null;
+  }
+  function edgeEvidence(e) {
+    const sup = [], con = [];
+    for (const inc of INC) {
+      const tm = inc.m.find(x => x[0] === e.t); if (!tm) continue;
+      const sd = incDirFor(inc, e.s); if (sd === null) continue;
+      (tm[1] === sd * e.sign ? sup : con).push(inc);
+    }
+    return { sup, con };
+  }
+
+  // ---------- propagation ----------
+  const MAX_DEPTH = 4, DECAY = 0.85, FLOOR = 0.03;
+  function propagate(seeds) {
+    const acc = {};
+    const touch = id => acc[id] || (acc[id] = { pos: 0, neg: 0, best: null, seed: false });
+    seeds.forEach(s => { const a = touch(s.id); a.seed = true; a.seedDir = s.dir; a.best = { v: s.dir, path: [s.id] }; });
+    function walk(id, val, path) {
+      if (path.length > MAX_DEPTH) return;
+      for (const e of OUT[id] || []) {
+        if (path.includes(e.t)) continue;
+        const v = val * e.sign * e.w * (path.length > 1 ? DECAY : 1);
+        if (Math.abs(v) < FLOOR) continue;
+        const a = touch(e.t);
+        if (a.seed) continue;
+        // Paths combine with diminishing returns (noisy-OR), so ten weak paths never outrank one strong direct link.
+        if (v > 0) a.pos = 1 - (1 - a.pos) * (1 - Math.min(v, 1)); else a.neg = -(1 - (1 + a.neg) * (1 - Math.min(-v, 1)));
+        const np = path.concat(e.t);
+        if (!a.best || Math.abs(v) > Math.abs(a.best.v)) a.best = { v, path: np };
+        walk(e.t, v, np);
+      }
+    }
+    seeds.forEach(s => walk(s.id, s.dir, [s.id]));
+    const out = [];
+    for (const id in acc) {
+      const a = acc[id];
+      if (a.seed) continue;
+      const score = a.pos + a.neg;
+      const big = Math.max(a.pos, -a.neg), small = Math.min(a.pos, -a.neg);
+      const mixed = small > 0.12 && small > 0.35 * big;
+      if (Math.abs(score) < 0.06 && !mixed) continue;
+      out.push({ id, score, path: a.best.path, mixed, pos: a.pos, neg: a.neg });
+    }
+    out.sort((x, y) => Math.abs(y.score) - Math.abs(x.score));
+    return { list: out, acc };
+  }
+  function pathDirs(path, seedDir) {
+    const dirs = [seedDir]; let d = seedDir;
+    for (let i = 1; i < path.length; i++) { const e = (OUT[path[i - 1]] || []).find(x => x.t === path[i]); d = d * (e ? e.sign : 1); dirs.push(d); }
+    return dirs;
+  }
+  function pathText(path, seedDir) {
+    const dirs = pathDirs(path, seedDir);
+    return path.map((id, i) => `${esc(BY[id].label)} ${arrow(dirs[i])}`).join(' → ');
+  }
+  const strengthWord = v => { const a = Math.abs(v); return a >= 0.5 ? 'strong' : a >= 0.25 ? 'moderate' : 'weak'; };
+
+  function nodeEvidence(id, dir, seeds) {
+    const same = INC.filter(inc => { const m = inc.m.find(x => x[0] === id); return m && m[1] === dir; });
+    const sameShock = same.filter(inc => seeds.some(s => (inc.shock || []).includes(s.id) && (inc.dir || 1) === Math.sign(s.dir)));
+    return { any: same.length, shock: sameShock.length, against: INC.filter(inc => { const m = inc.m.find(x => x[0] === id); return m && m[1] === -dir && seeds.some(s => (inc.shock || []).includes(s.id) && (inc.dir || 1) === Math.sign(s.dir)); }).length };
+  }
+
+  // ---------- state ----------
+  let current = null; // { title, seeds, result }
+  let selected = null;
+  let showAll = { up: false, down: false };
+
+  // ---------- presets ----------
+  const presetBox = $('#presets');
+  R.presets.forEach(p => {
+    const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', 'data-k': p.k }, esc(p.label));
+    b.addEventListener('click', () => runShock(p.label, p.seeds.map(([id, dir]) => ({ id, dir })), p.k));
+    presetBox.appendChild(b);
+  });
+
+  function runShock(title, seeds, key, extra) {
+    seeds = seeds.filter(s => BY[s.id]);
+    if (!seeds.length) return;
+    const result = propagate(seeds);
+    current = { title, seeds, result, extra: extra || null };
+    showAll = { up: false, down: false };
+    presetBox.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === key ? 'true' : 'false'));
+    renderResults();
+    paintGraph();
+  }
+
+  function clearShock() {
+    current = null;
+    presetBox.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    renderResults();
+    paintGraph();
+  }
+
+  // ---------- results ----------
+  function renderResults() {
+    const box = $('#results');
+    if (!current) {
+      box.innerHTML = '<p class="empty">Pick a shock above, or open any item in the map and choose &ldquo;Run as shock&rdquo;.</p>';
+      return;
+    }
+    const { title, seeds, result } = current;
+    const up = result.list.filter(r => !r.mixed && r.score > 0), down = result.list.filter(r => !r.mixed && r.score < 0);
+    const both = result.list.filter(r => r.mixed);
+    const seedTxt = seeds.map(s => `${esc(BY[s.id].label)} ${arrow(s.dir)}`).join(', ');
+    let html = `<div class="res-head"><div><p class="eyebrow">Shock</p><h3>${esc(title)}</h3><p class="muted" style="font-size:.88rem">Starts at: ${seedTxt}. ${result.list.length} items react within four links.</p></div><button class="btn ghost" type="button" id="clearShock">Clear</button></div>`;
+    html += '<div class="res-cols">' + col('up', 'Tends to rise', up) + col('down', 'Tends to fall', down) + '</div>';
+    if (both.length) {
+      html += '<div class="analogs"><h4 class="eyebrow" style="margin:0">Pulled both ways</h4><p class="muted" style="font-size:.86rem">Links push these in opposite directions. Which side wins has depended on the episode.</p><div class="res-cols">' + both.map(r => {
+        const n = BY[r.id];
+        return `<button class="res-item" type="button" data-id="${r.id}"><span class="res-top"><span class="res-name">${esc(n.label)}</span><span class="res-str"><span class="mv up">▲ ${Math.round(r.pos * 100)}</span> · <span class="mv down">▼ ${Math.round(-r.neg * 100)}</span></span></span><span class="res-path">Strongest path: ${pathText(r.path, (seeds.find(s => s.id === r.path[0]) || seeds[0]).dir)}</span></button>`;
+      }).join('') + '</div></div>';
+    }
+    const analog = INC.filter(inc => seeds.some(s => (inc.shock || []).includes(s.id) && (inc.dir || 1) === Math.sign(s.dir))).slice(0, 6);
+    if (analog.length) {
+      html += '<div class="analogs"><h4 class="eyebrow" style="margin:0">Past episodes of this kind of shock</h4><ul>' + analog.map(inc => `<li><span class="muted" style="font-family:var(--mono);font-size:.8rem">${fmtDate(inc.d)}</span> <b>${esc(inc.t)}</b>: ${inc.m.slice(0, 2).map(m => `<span class="mv ${m[1] > 0 ? 'up' : 'down'}">${arrow(m[1])} ${esc(BY[m[0]].label)}</span> ${esc(m[2])}`).join('; ')}.</li>`).join('') + '</ul></div>';
+    }
+    box.innerHTML = html;
+    $('#clearShock').addEventListener('click', clearShock);
+    box.querySelectorAll('.res-item').forEach(b => b.addEventListener('click', () => { select(b.dataset.id); document.getElementById('map').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }));
+    box.querySelectorAll('.more').forEach(b => b.addEventListener('click', () => { showAll[b.dataset.side] = !showAll[b.dataset.side]; renderResults(); }));
+
+    function col(side, label, items) {
+      const lim = showAll[side] ? items.length : 10;
+      const seedDir = seeds[0].dir;
+      let h = `<div class="res-col ${side}"><h3>${side === 'up' ? '▲' : '▼'} ${label} <span class="tag">${items.length}</span></h3>`;
+      if (!items.length) h += '<p class="empty">Nothing in the map.</p>';
+      items.slice(0, lim).forEach(r => {
+        const n = BY[r.id], dir = r.score > 0 ? 1 : -1;
+        const sd = (seeds.find(s => s.id === r.path[0]) || seeds[0]).dir;
+        const ev = nodeEvidence(r.id, dir, seeds);
+        const evTxt = ev.shock ? `seen in ${ev.shock} past ${ev.shock === 1 ? 'episode' : 'episodes'} of this shock` : ev.any ? `moved this way in ${ev.any} past ${ev.any === 1 ? 'episode' : 'episodes'}` : 'no logged episode';
+        h += `<button class="res-item" type="button" data-id="${r.id}"><span class="res-top"><span class="res-name">${esc(n.label)}</span><span class="res-str">${strengthWord(r.score)} · ${Math.round(Math.abs(r.score) * 100)}</span></span><span class="bar"><i style="width:${Math.round(Math.abs(r.score) * 100)}%"></i></span><span class="res-path">${pathText(r.path, sd)}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag">${LAYER_SHORT[n.layer]}</span>${r.mixed ? '<span class="tag mixed">mixed signals</span>' : ''}<span class="tag ev">${evTxt}${ev.against ? `, ${ev.against} against` : ''}</span></span></button>`;
+      });
+      if (items.length > 10) h += `<button class="more" type="button" data-side="${side}">${showAll[side] ? 'Show top 10' : `Show all ${items.length}`}</button>`;
+      return h + '</div>';
+    }
+  }
+
+  // ---------- graph ----------
+  const COLW = 236, NW = 196, NH = 24, GAP = 6, TOP = 46, LEFT = 16;
+  const counts = [0, 0, 0, 0, 0]; NODES.forEach(n => counts[n.layer]++);
+  const maxC = Math.max(...counts);
+  const W = LEFT * 2 + 4 * COLW + NW + 24, H = TOP + maxC * (NH + GAP) + 16;
+  const POS = {}; const idx = [0, 0, 0, 0, 0];
+  NODES.forEach(n => {
+    const off = (maxC - counts[n.layer]) * (NH + GAP) / 2;
+    POS[n.id] = { x: LEFT + n.layer * COLW, y: TOP + off + idx[n.layer]++ * (NH + GAP), layer: n.layer };
+  });
+  function edgePath(e) {
+    const a = POS[e.s], b = POS[e.t];
+    const y1 = a.y + NH / 2, y2 = b.y + NH / 2;
+    if (a.layer < b.layer) { const x1 = a.x + NW, x2 = b.x - 2, dx = (x2 - x1) / 2; return `M${x1} ${y1}C${x1 + dx} ${y1},${x2 - dx} ${y2},${x2} ${y2}`; }
+    if (a.layer === b.layer) { const x = a.x + NW, bl = 22 + Math.abs(y2 - y1) * 0.14; return `M${x} ${y1}C${x + bl} ${y1},${x + bl} ${y2},${x + 2} ${y2}`; }
+    const x1 = a.x, x2 = b.x + NW + 2, dx = Math.max(36, (x1 - x2) / 2); return `M${x1} ${y1}C${x1 - dx} ${y1},${x2 + dx} ${y2},${x2} ${y2}`;
+  }
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('role', 'group'); svg.setAttribute('aria-label', 'Causal map of shocks, macro drivers, commodities, companies and funds');
+  let defs = '<defs>';
+  [['same', 'mk-up'], ['opp', 'mk-down']].forEach(([k, c]) => { defs += `<marker id="ar-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="${c}" d="M0 0L10 5L0 10z"/></marker>`; });
+  defs += '</defs>';
+  let inner = defs;
+  LAYERS.forEach((l, i) => { inner += `<text class="colhead" x="${LEFT + i * COLW}" y="26">${esc(l)}</text><rect x="${LEFT + i * COLW}" y="32" width="28" height="3" rx="1.5" fill="var(--l${i})"/>`; });
+  inner += '<g id="edges">' + EDGES.map((e, i) => `<path class="edge" data-i="${i}" d="${edgePath(e)}"/>`).join('') + '</g>';
+  inner += '<g id="nodes">' + NODES.map(n => {
+    const p = POS[n.id];
+    const lab = n.label.length > 27 ? n.label.slice(0, 26) + '…' : n.label;
+    return `<g class="node" data-id="${n.id}" transform="translate(${p.x},${p.y})" tabindex="0" role="button" aria-label="${esc(n.label)}"><title>${esc(n.label)}</title><rect class="box" width="${NW}" height="${NH}" rx="6"/><rect x="0" y="0" width="4" height="${NH}" rx="2" fill="var(--l${n.layer})"/><text x="12" y="16">${esc(lab)}</text><text class="arrow" x="${NW - 8}" y="16" text-anchor="end"></text></g>`;
+  }).join('') + '</g>';
+  svg.innerHTML = inner;
+  $('#graph').appendChild(svg);
+  const edgeEls = [...svg.querySelectorAll('.edge')];
+  const nodeEls = Object.fromEntries([...svg.querySelectorAll('.node')].map(g => [g.dataset.id, g]));
+  Object.values(nodeEls).forEach(g => {
+    g.addEventListener('click', () => select(g.dataset.id === selected ? null : g.dataset.id));
+    g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(g.dataset.id === selected ? null : g.dataset.id); } });
+  });
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && selected) select(null); });
+
+  function paintGraph() {
+    const scores = {}; const onPath = new Set(); const seedSet = new Set();
+    if (current) {
+      current.seeds.forEach(s => { scores[s.id] = s.dir; seedSet.add(s.id); });
+      current.result.list.forEach(r => { scores[r.id] = r.score; for (let i = 1; i < r.path.length; i++) onPath.add(r.path[i - 1] + '>' + r.path[i]); });
+    }
+    for (const id in nodeEls) {
+      const g = nodeEls[id], sc = scores[id];
+      g.classList.toggle('nup', sc > 0); g.classList.toggle('ndown', sc < 0);
+      g.classList.toggle('seed', seedSet.has(id));
+      g.classList.toggle('sel', id === selected);
+      g.querySelector('.arrow').textContent = sc ? (arrow(sc) + (seedSet.has(id) ? '' : ' ' + Math.round(Math.abs(sc) * 100))) : '';
+      let faded = false;
+      if (selected) { faded = !(id === selected || (OUT[selected] || []).some(e => e.t === id) || (IN[selected] || []).some(e => e.s === id)); }
+      else if (current) { faded = sc === undefined; }
+      g.classList.toggle('faded', faded);
+    }
+    edgeEls.forEach((p, i) => {
+      const e = EDGES[i];
+      p.classList.remove('same', 'opp', 'dim'); p.removeAttribute('marker-end');
+      let hot = false;
+      if (selected) hot = e.s === selected || e.t === selected;
+      else if (current) hot = onPath.has(e.s + '>' + e.t);
+      if (hot) {
+        let cls;
+        if (!selected && current) cls = (scores[e.t] || 0) > 0 ? 'same' : 'opp';
+        else cls = e.sign > 0 ? 'same' : 'opp';
+        p.classList.add(cls); p.setAttribute('marker-end', `url(#ar-${cls})`);
+        p.parentNode.appendChild(p);
+      } else if (selected || current) p.classList.add('dim');
+    });
+  }
+
+  // ---------- detail ----------
+  function select(id) {
+    selected = id;
+    renderDetail();
+    paintGraph();
+    if (id && nodeEls[id]) {
+      const wrap = $('#graph'), p = POS[id];
+      const target = p.x - wrap.clientWidth / 2 + NW / 2;
+      if (wrap.scrollWidth > wrap.clientWidth) wrap.scrollTo({ left: Math.max(0, target), behavior: 'auto' });
+    }
+  }
+  function linkHtml(e, side) {
+    const other = BY[side === 'in' ? e.s : e.t];
+    const ev = edgeEvidence(e);
+    const sg = e.sign > 0 ? '<span class="sg same">same way</span>' : '<span class="sg opp">opposite way</span>';
+    const evTxt = ev.sup.length || ev.con.length ? ` · ${ev.sup.length} ${ev.sup.length === 1 ? 'episode' : 'episodes'} agree${ev.con.length ? `, ${ev.con.length} disagree` : ''}` : '';
+    return `<button class="link" type="button" data-go="${other.id}"><span class="lt"><b>${esc(other.label)}</b>${sg}</span><span class="why">${esc(e.why)}</span><span class="sg" style="color:var(--muted)">weight ${e.w.toFixed(2)} · lag: ${esc(e.lag)}${evTxt}</span>${measuredHtml(e)}</button>`;
+  }
+  function renderDetail() {
+    const box = $('#detail');
+    if (!selected) {
+      box.innerHTML = `<p class="eyebrow">Selected item</p><h3>Nothing selected</h3><p class="empty">Click any box in the map. You will see what pushes it, what it pushes, and the past episodes behind each link. Press Esc to clear.</p><h4>Most connected</h4><div class="links">${NODES.map(n => ({ n, c: (OUT[n.id] || []).length + (IN[n.id] || []).length })).sort((a, b) => b.c - a.c).slice(0, 6).map(({ n, c }) => `<button class="link" type="button" data-go="${n.id}"><span class="lt"><b>${esc(n.label)}</b><span class="sg" style="color:var(--muted)">${c} links</span></span></button>`).join('')}</div>`;
+    } else {
+      const n = BY[selected];
+      const ins = (IN[n.id] || []).slice().sort((a, b) => b.w - a.w);
+      const outs = (OUT[n.id] || []).slice().sort((a, b) => b.w - a.w);
+      const eps = INC.filter(inc => inc.m.some(m => m[0] === n.id) || (inc.shock || []).includes(n.id));
+      box.innerHTML = `<p class="eyebrow">${esc(LAYERS[n.layer])}</p><h3>${esc(n.label)}</h3><p>${esc(n.desc)}</p><p class="inst"><b>Where it trades:</b> ${esc(n.inst)}</p>${modelHtml(n.id)}
+        <div class="row-btns"><button class="btn" type="button" id="runUp">Run as shock ▲</button><button class="btn ghost" type="button" id="runDown">Run as shock ▼</button></div>
+        <div class="links"><h4>What moves it (${ins.length})</h4>${ins.length ? ins.map(e => linkHtml(e, 'in')).join('') : '<p class="empty">It is a starting shock: nothing in the map pushes it.</p>'}</div>
+        <div class="links"><h4>What it moves (${outs.length})</h4>${outs.length ? outs.map(e => linkHtml(e, 'out')).join('') : '<p class="empty">An end point: funds and coins that other items feed into.</p>'}</div>
+        <div><h4>Past episodes (${eps.length})</h4>${eps.length ? eps.map(inc => { const m = inc.m.find(x => x[0] === n.id); return `<div class="ep"><span class="d">${fmtDate(inc.d)}</span><span><b>${esc(inc.t)}</b></span>${m ? `<span class="mv ${m[1] > 0 ? 'up' : 'down'}">${arrow(m[1])} ${esc(m[2])}</span>` : `<span class="muted">This was the shock.</span>`}</div>`; }).join('') + `<button class="more" type="button" id="toLedger">Show these in the episode library</button>` : '<p class="empty">No logged episode yet.</p>'}</div>`;
+      $('#runUp').addEventListener('click', () => runShock(`${n.label} rises`, [{ id: n.id, dir: 1 }], null));
+      $('#runDown').addEventListener('click', () => runShock(`${n.label} falls`, [{ id: n.id, dir: -1 }], null));
+      const tl = $('#toLedger'); if (tl) tl.addEventListener('click', () => { nodeFilter = n.id; renderLedger(); $('#history').scrollIntoView({ block: 'start' }); });
+    }
+    box.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => select(b.dataset.go)));
+  }
+
+  // ---------- ledger ----------
+  let nodeFilter = null;
+  $('#q').addEventListener('input', renderLedger);
+  $('#clearNode').addEventListener('click', () => { nodeFilter = null; renderLedger(); });
+  function renderLedger() {
+    const q = $('#q').value.trim().toLowerCase();
+    const rows = INC.filter(inc => {
+      if (nodeFilter && !(inc.m.some(m => m[0] === nodeFilter) || (inc.shock || []).includes(nodeFilter))) return false;
+      if (!q) return true;
+      const hay = [inc.d, inc.t, inc.lesson, ...inc.m.map(m => BY[m[0]].label + ' ' + m[2]), ...(inc.shock || []).map(s => BY[s].label)].join(' ').toLowerCase();
+      return q.split(/\s+/).every(w => hay.includes(w));
+    });
+    const cn = $('#clearNode');
+    cn.hidden = !nodeFilter; if (nodeFilter) cn.textContent = `Only ${BY[nodeFilter].label} ×`;
+    $('#histCount').textContent = `${rows.length} of ${INC.length} episodes`;
+    const head = '<div class="lrow head"><span>Date</span><span>Episode</span><span>What moved</span><span>Source</span></div>';
+    $('#ledger').innerHTML = head + (rows.length ? rows.map(inc => `<div class="lrow"><span class="d">${fmtDate(inc.d)}</span><div><div class="t">${esc(inc.t)}</div><div class="les">${esc(inc.lesson)}</div></div><div class="moves">${inc.m.map(m => `<button type="button" data-go="${m[0]}"><span class="mv ${m[1] > 0 ? 'up' : 'down'}">${arrow(m[1])} <b>${esc(BY[m[0]].label)}</b></span> <span class="muted">${esc(m[2])}</span></button>`).join('')}</div><span class="src">${inc.src === 'approx' ? 'approx.' : `<a href="${esc(inc.src)}" target="_blank" rel="noopener">source</a>`}</span></div>`).join('') : '<div class="lrow"><span class="empty">No episode matches. Try a broader word.</span></div>');
+    $('#ledger').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { select(b.dataset.go); $('#map').scrollIntoView({ block: 'start' }); }));
+  }
+
+  // ---------- ask Claude ----------
+  (async function initAsk() {
+    let sample = null;
+    try { sample = window.claude && window.claude.use ? await window.claude.use('sample') : null; } catch (e) { sample = null; }
+    if (!sample) return;
+    const box = $('#ask'), form = $('#askForm'), input = $('#askInput'), btn = $('#askBtn'), stop = $('#askStop'), out = $('#askOut');
+    box.hidden = false;
+    let ctl = null;
+    stop.addEventListener('click', () => ctl && ctl.abort());
+    const nodeList = NODES.map(n => `${n.id} | ${LAYER_SHORT[n.layer]} | ${n.label}`).join('\n');
+    form.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const text = input.value.trim();
+      if (!text) { out.innerHTML = '<p class="empty">Describe an event first.</p>'; return; }
+      ctl = new AbortController();
+      btn.disabled = true; stop.hidden = false;
+      out.innerHTML = '<p class="muted">Thinking...</p>';
+      const prompt = `You map a news event onto a causal market graph used for research (not investment advice).\n\nGraph nodes (id | layer | label):\n${nodeList}\n\nEvent: "${text.replace(/"/g, "'")}"\n\nPick the 1 to 4 nodes this event hits FIRST (prefer shock, macro or commodity nodes; use only ids from the list). dir is 1 if the node rises or intensifies, -1 if it falls or eases.\nReply with only JSON in this shape:\n{"headline":"one sentence on the main channel","seeds":[{"id":"node_id","dir":1,"why":"short reason"}],"watch":["2 to 4 indicators to watch"],"analogues":[{"when":"year","event":"past event","outcome":"what moved and roughly how much"}],"blind_spot":"one hidden supply-chain link the market might miss"}\nGive up to 3 analogues; write 'approximately' when unsure of a figure.`;
+      try {
+        const res = await sample.json(prompt, { signal: ctl.signal });
+        const seeds = (Array.isArray(res && res.seeds) ? res.seeds : []).map(s => ({ id: String(s.id), dir: Number(s.dir) < 0 ? -1 : 1, why: String(s.why || '') })).filter(s => BY[s.id]).slice(0, 4);
+        if (!seeds.length) { out.innerHTML = '<p class="empty">Claude did not name any item in the map. Try describing the event more concretely.</p>'; return; }
+        const list = a => (Array.isArray(a) ? a : []).slice(0, 4);
+        out.innerHTML = `<p><b>${esc(res.headline || text)}</b></p>
+          <p><span class="eyebrow">Hits first</span><br>${seeds.map(s => `<span class="mv ${s.dir > 0 ? 'up' : 'down'}">${arrow(s.dir)} <b>${esc(BY[s.id].label)}</b></span> <span class="muted">${esc(s.why)}</span>`).join('<br>')}</p>
+          ${list(res.watch).length ? `<p><span class="eyebrow">Watch</span></p><ul>${list(res.watch).map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+          ${list(res.analogues).length ? `<p><span class="eyebrow">Analogues suggested by Claude (check before relying)</span></p><ul>${list(res.analogues).map(a => `<li><b>${esc(a.when || '')}</b> ${esc(a.event || '')}: ${esc(a.outcome || '')}</li>`).join('')}</ul>` : ''}
+          ${res.blind_spot ? `<p><span class="eyebrow">Possible blind spot</span><br>${esc(res.blind_spot)}</p>` : ''}`;
+        runShock(text.length > 80 ? text.slice(0, 78) + '…' : text, seeds.map(s => ({ id: s.id, dir: s.dir })), null);
+      } catch (e) {
+        const code = e && e.code;
+        if (code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared' || code === 'capability_disabled' || code === 'capability_removed') { box.hidden = true; }
+        else if (code === 'cancelled') out.innerHTML = '<p class="empty">Stopped.</p>';
+        else if (code === 'rate_limited') out.innerHTML = '<p class="empty">Too many requests right now. Try again in a little while.</p>';
+        else if (code === 'invalid_json') out.innerHTML = '<p class="empty">Claude’s answer could not be read as a map. Press Map it to try again.</p>';
+        else if (code === 'refused') out.innerHTML = '<p class="empty">Claude declined that one. Try describing a different event.</p>';
+        else out.innerHTML = '<p class="empty">Something went wrong reaching Claude. Press Map it to try again.</p>';
+      } finally {
+        btn.disabled = false; stop.hidden = true; ctl = null;
+      }
+    });
+  })();
+
+  // ---------- live desk (artifact database, written by the two-hourly job) ----------
+  const LIVE = { feed: null, signals: null, cal: null, status: null, corr: null };
+  let CAL = {};
+  let feedAll = false, sigAll = false;
+  const safeUrl = u => /^https?:\/\//i.test(String(u || '')) ? String(u) : null;
+  function ago(ts) {
+    const t = Date.parse(ts); if (!t) return '';
+    const m = Math.round((Date.now() - t) / 60000);
+    if (m < 60) return `${Math.max(m, 1)} min ago`;
+    const h = Math.round(m / 60); if (h < 48) return `${h} h ago`;
+    return fmtDate(String(ts).slice(0, 10));
+  }
+  const pct = v => `${Math.round(v * 100)}%`;
+  function measuredHtml(e) {
+    const c = CAL[e.s + '>' + e.t];
+    if (!c) return '';
+    if (c.verdict === 'untestable') return '<span class="measured">Measured: no market series to test</span>';
+    const word = { confirmed: 'confirmed in prices', supported: 'weakly supported', unclear: 'not clear in prices', contradicted: 'contradicted by prices' }[c.verdict] || c.verdict;
+    const pred = c.predictive && c.predictive !== 'none' ? ` · still predictive ${esc(c.predictive)} after the shock` : ' · no edge after the shock day';
+    return `<span class="measured ${esc(c.verdict)}">Measured: ${word} · ${pct(c.hit5)} of ${c.n} shocks vs ${pct(c.base5)} base${pred}</span>`;
+  }
+  function modelHtml(id) {
+    const s = LIVE.signals && LIVE.signals.items && LIVE.signals.items[id];
+    if (!s || !s.h20) return '';
+    const cell = r => r ? `${pct(r.prob_up)} ${r.has_skill ? '<span class="skill-yes">beat naive</span>' : '<span class="muted">no proven skill</span>'}` : '–';
+    return `<p class="inst"><b>Model, chance of being higher:</b> 5 days ${cell(s.h5)} · 20 days ${cell(s.h20)} <span class="muted">(${esc(s.symbol)}, tested 2014–2026)</span></p>`;
+  }
+  function recentSeeds(days) {
+    const ev = (LIVE.feed && LIVE.feed.events) || [];
+    const W = { minor: 0.3, notable: 0.6, major: 1 };
+    const agg = {};
+    ev.forEach(e => {
+      const age = (Date.now() - Date.parse(e.ts)) / 864e5;
+      if (!(age >= 0) || age > days) return;
+      const mag = (W[e.scale] || 0.3) * Math.pow(0.5, age / 3);
+      (e.nodes || []).forEach(n => { if (BY[n.id]) agg[n.id] = (agg[n.id] || 0) + (n.dir < 0 ? -1 : 1) * mag; });
+    });
+    return Object.entries(agg).map(([id, v]) => ({ id, dir: Math.max(-1, Math.min(1, 0.5 * v)) })).filter(s => Math.abs(s.dir) >= 0.05).sort((a, b) => Math.abs(b.dir) - Math.abs(a.dir)).slice(0, 8);
+  }
+  $('#tracePressure').addEventListener('click', () => {
+    const seeds = recentSeeds(7);
+    if (seeds.length) { runShock('Recent world events, last 7 days', seeds, null); $('#sim').scrollIntoView({ block: 'start' }); }
+  });
+  function renderLive() {
+    const st = LIVE.status;
+    $('#liveStatus').textContent = st ? `Updated ${ago(st.updated)} · ${st.events_total} events logged, ${st.events_24h} in the last 24 hours · refreshes every 2 hours` : 'Waiting for the first run of the two-hourly job.';
+    const ev = (LIVE.feed && Array.isArray(LIVE.feed.events)) ? LIVE.feed.events : [];
+    const feedBox = $('#feed');
+    if (ev.length) {
+      const lim = feedAll ? 40 : 10;
+      feedBox.innerHTML = ev.slice(0, lim).map(e => {
+        const u = safeUrl(e.url);
+        const title = u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : `<b>${esc(e.title)}</b>`;
+        return `<div class="ev"><div class="meta"><span class="d">${esc(ago(e.ts))}</span><span class="tag ${esc(e.scale)}">${esc(e.scale)}</span><span>${esc(e.region || '')}${e.category ? ' · ' + esc(e.category) : ''}</span>${e.source ? `<span>${esc(e.source)}</span>` : ''}</div>${title}${e.summary ? `<span class="sum">${esc(e.summary)}</span>` : ''}<div class="nodes">${(e.nodes || []).filter(n => BY[n.id]).map(n => `<button class="nchip" type="button" data-go="${esc(n.id)}" title="${esc(n.why || '')}"><span class="mv ${n.dir < 0 ? 'down' : 'up'}">${arrow(n.dir < 0 ? -1 : 1)}</span> ${esc(BY[n.id].label)}</button>`).join('')}</div></div>`;
+      }).join('') + (ev.length > 10 ? `<button class="more" type="button" id="feedMore">${feedAll ? 'Show fewer' : `Show ${Math.min(ev.length, 40)} events`}</button>` : '');
+      const fm = $('#feedMore'); if (fm) fm.addEventListener('click', () => { feedAll = !feedAll; renderLive(); });
+    }
+    const pr = LIVE.signals && LIVE.signals.pressure;
+    if (pr && Object.keys(pr).length) {
+      const rows = Object.entries(pr).filter(([id]) => BY[id] && BY[id].layer > 0).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 12);
+      $('#pressure').innerHTML = rows.map(([id, v]) => {
+        const w = Math.min(Math.abs(v), 1) * 50;
+        const bar = v >= 0 ? `<i style="left:50%;width:${w}%;background:var(--up)"></i>` : `<i style="right:50%;width:${w}%;background:var(--down)"></i>`;
+        return `<button class="prow" type="button" data-go="${esc(id)}"><span>${esc(BY[id].label)}</span><span class="pbar">${bar}</span><span class="pv mv ${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${Math.round(v * 100)}</span></button>`;
+      }).join('');
+      $('#tracePressure').hidden = !ev.length;
+    }
+    const sg = LIVE.signals;
+    if (sg && sg.items) {
+      const s20 = sg.summary && sg.summary.h20, s5 = sg.summary && sg.summary.h5;
+      if (s20 && s5) $('#modelSummary').textContent = `${s20.with_skill} of ${s20.targets} assets beat naive at 20 days, ${s5.with_skill} at 5 days · median AUC ${s20.median_auc} (0.5 is a coin flip) · prices as of ${fmtDate(String((Object.values(sg.items)[0].h20 || {}).asof || sg.model_asof))}`;
+      const skillOf = r => (r.h20 && r.h20.has_skill) || (r.h5 && r.h5.has_skill) ? 1 : 0;
+      const rows = Object.entries(sg.items).filter(([id]) => BY[id]).sort((a, b) => skillOf(b[1]) - skillOf(a[1]) || Math.abs(((b[1].h20 || {}).prob_up || 0.5) - 0.5) - Math.abs(((a[1].h20 || {}).prob_up || 0.5) - 0.5));
+      const lim = sigAll ? rows.length : 12;
+      const cell = r => !r ? '<td class="num">–</td>' : `<td class="num">${r.has_skill ? `<span class="mv ${r.prob_up >= 0.5 ? 'up' : 'down'}">${pct(r.prob_up)}</span>` : `<span class="muted">${pct(r.prob_up)}</span>`}</td>`;
+      $('#signals').innerHTML = `<table><thead><tr><th>Asset</th><th>Proxy</th><th>Up in 5 days</th><th>Up in 20 days</th><th>Tested 2014–2026</th></tr></thead><tbody>${rows.slice(0, lim).map(([id, r]) => {
+        const sk = r.h20 && r.h20.has_skill ? `<span class="skill-yes">beat naive at 20d</span> <span class="muted">AUC ${r.h20.auc}, right ${pct(r.h20.acc)} vs ${pct(r.h20.acc_naive)}</span>` : r.h5 && r.h5.has_skill ? `<span class="skill-yes">beat naive at 5d</span> <span class="muted">AUC ${r.h5.auc}</span>` : '<span class="muted">no proven skill</span>';
+        return `<tr><td><button type="button" data-go="${esc(id)}">${esc(BY[id].label)}</button></td><td class="num muted">${esc(r.symbol)}</td>${cell(r.h5)}${cell(r.h20)}<td>${sk}</td></tr>`;
+      }).join('')}</tbody></table>${rows.length > 12 ? `<button class="more" type="button" id="sigMore">${sigAll ? 'Show top 12' : `Show all ${rows.length}`}</button>` : ''}`;
+      const sm = $('#sigMore'); if (sm) sm.addEventListener('click', () => { sigAll = !sigAll; renderLive(); });
+    }
+    document.querySelectorAll('#live [data-go]').forEach(b => b.addEventListener('click', () => { select(b.dataset.go); $('#map').scrollIntoView({ block: 'start' }); }));
+  }
+  (async function initLive() {
+    let db = null;
+    try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { db = null; }
+    if (!db) { $('#liveStatus').textContent = 'The live desk works when this page is opened in Claude.'; loadLocalPortfolio(); $('#pfOut').innerHTML = '<p class="empty">The portfolio view needs the stock profiles, which load when this page is opened in Claude.</p>'; return; }
+    const sub = (path, key, after) => db.doc(path).onSnapshot(s => { LIVE[key] = s.exists ? s.data() : null; if (after) after(); renderLive(); }, () => {});
+    sub('feed/latest', 'feed');
+    sub('correlations/latest', 'corr', () => renderCorr());
+    STK.db = db;
+    db.doc('screen/latest').onSnapshot(s => { SCR.data = s.exists ? s.data() : null; renderScreen(); if (PF.holdings.length && STK.index) analysePortfolio(); }, () => {});
+    initPortfolio(db);
+    db.doc('stocks/index').onSnapshot(s => { STK.index = s.exists ? s.data() : null; renderStocks(); if (PF.holdings.length && SCR.data) analysePortfolio(); if (STK.index && !STK.current) { const first = STK.index.stocks.XOM ? 'XOM' : Object.keys(STK.index.stocks)[0]; $('#stockQ').value = first; openStock(first); } }, () => {});
+    db.doc('stocks/factors').onSnapshot(s => { STK.factors = s.exists ? s.data() : null; STK.shards = {}; renderStocks(); if (STK.current) openStock(STK.current); }, () => {});
+    sub('status/run', 'status');
+    sub('signals/latest', 'signals', () => { if (selected) renderDetail(); renderStocks(); });
+    sub('calibration/links', 'cal', () => {
+      CAL = {};
+      ((LIVE.cal && LIVE.cal.edges) || []).forEach(c => { CAL[c.s + '>' + c.t] = c; });
+      if (selected) renderDetail();
+    });
+  })();
+
+  // ---------- correlation explorer ----------
+  let pairIdx = null, anyA = 'gold', anyB = 'usd';
+  const sgn = v => v == null ? '–' : `${v > 0 ? '+' : ''}${Number(v).toFixed(2)}`;
+  const lbl = id => (BY[id] ? BY[id].label : id);
+  const strength = r => { const a = Math.abs(r || 0); return a < 0.2 ? 'weak' : a < 0.4 ? 'moderate' : 'strong'; };
+  function rollChart(series) {
+    if (!series || series.length < 6) return '';
+    const W = 640, H = 210, L = 36, R = 52, T = 14, B = 26;
+    const X = i => L + i / (series.length - 1) * (W - L - R), Y = v => T + (1 - v) / 2 * (H - T - B);
+    const pts = series.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join('');
+    const grid = [-1, -0.5, 0, 0.5, 1].map(v => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v === 0 ? 'var(--muted)' : 'var(--line)'}" stroke-width="${v === 0 ? 1 : 0.8}"/><text x="${L - 6}" y="${Y(v) + 3.5}" text-anchor="end">${sgn(v).replace('.00', '')}</text>`).join('');
+    const years = []; series.forEach((p, i) => { if (p[0].endsWith('-01') && Number(p[0].slice(0, 4)) % 2 === 0) years.push(`<text x="${X(i)}" y="${H - 8}" text-anchor="middle">${p[0].slice(0, 4)}</text>`); });
+    const last = series[series.length - 1];
+    return `<svg class="rc" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Rolling 26-week correlation"><rect x="${L}" y="${T}" width="${W - L - R}" height="${(H - T - B) / 2}" fill="var(--up-soft)" opacity="0.45"/><rect x="${L}" y="${Y(0)}" width="${W - L - R}" height="${(H - T - B) / 2}" fill="var(--down-soft)" opacity="0.45"/>${grid}${years.join('')}<path d="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.8"/><circle cx="${X(series.length - 1)}" cy="${Y(last[1])}" r="3.5" fill="var(--accent)"/><text x="${X(series.length - 1) + 6}" y="${Y(last[1]) + 4}" style="fill:var(--ink)">${sgn(last[1])}</text></svg>`;
+  }
+  function pairCard(r) {
+    const A = esc(lbl(r.a)), Bn = esc(lbl(r.b));
+    const ll = r.lead_lag && r.lead_lag.a_leads_b_1w;
+    const yr = r.corr_range_by_year;
+    const verdict = r.predictive
+      ? `<b>Predictive:</b> ${A}'s move this week has told you something about ${Bn}'s next week, in both halves of the sample.`
+      : `<b>No predictive edge.</b> They move together ${strength(r.weekly_corr)}ly on the same days${r.weekly_corr_ex_spx != null && Math.abs(r.weekly_corr_ex_spx) < Math.abs(r.weekly_corr) * 0.6 ? ', mostly because both follow the stock market' : ''}, but this week's ${A} move says nothing reliable about next week's ${Bn}.`;
+    return `<div class="stats">
+      <div class="stat"><span class="k">Weekly correlation</span><span class="v">${sgn(r.weekly_corr)}</span><span class="s">${strength(r.weekly_corr)} · daily ${sgn(r.daily_corr)}, monthly ${sgn(r.monthly_corr)}</span></div>
+      <div class="stat"><span class="k">After removing S&amp;P 500</span><span class="v">${sgn(r.weekly_corr_ex_spx)}</span><span class="s">what is left once the shared market swing is taken out</span></div>
+      <div class="stat"><span class="k">Year by year</span><span class="v">${yr ? `${sgn(yr[0])} to ${sgn(yr[1])}` : '–'}</span><span class="s">sign flipped ${r.sign_flips} ${r.sign_flips === 1 ? 'time' : 'times'}</span></div>
+      <div class="stat"><span class="k">Stressed vs calm markets</span><span class="v">${sgn(r.weekly_corr_high_vix)} / ${sgn(r.weekly_corr_low_vix)}</span><span class="s">high VIX vs low VIX weeks</span></div>
+      <div class="stat"><span class="k">${A} fell in a month</span><span class="v">${pct(r.b_down_same_month)}</span><span class="s">of those months ${Bn} fell too (usual ${pct(r.b_base_down_rate)}); next month ${pct(r.b_down_next_month)}</span></div>
+      <div class="stat"><span class="k">${A} leads by a week?</span><span class="v">${sgn(ll && ll.corr)}</span><span class="s">p = ${ll ? ll.p : '–'} · halves ${ll ? `${sgn(ll.first_half)} / ${sgn(ll.second_half)}` : ''}</span></div>
+    </div>
+    <p class="eyebrow" style="margin:4px 0 0">Correlation over the previous 26 weeks, ${esc(r.from.slice(0, 4))}–${esc(r.to.slice(0, 4))}</p>
+    ${rollChart(r.rolling26w)}
+    <p class="verdict">${verdict}</p>`;
+  }
+  function renderCorr() {
+    const c = LIVE.corr; if (!c || !c.famous) return;
+    const ex = c.experiment;
+    $('#corrAsof').textContent = `Weekly returns since ${c.since} · computed ${fmtDate(c.asof)}`;
+    $('#corrLead').innerHTML = `Correlation tells you what moves together; only lead-lag tells you what comes next. Of <b>${c.lead_lag_tests.toLocaleString('en-US')}</b> tests of whether one asset's weekly move predicts another's next week, <b>${c.lead_lag.length}</b> held up after correcting for running so many tests.${ex ? ` Giving the forecasting model every asset's recent moves made it worse on unseen years: <b>${ex.x_beats_naive} of ${ex.targets}</b> assets beat a naive forecast with them, <b>${ex.base_beats_naive}</b> without.` : ''}`;
+    const sel = $('#pairSel');
+    if (pairIdx === null) { pairIdx = Math.max(0, c.famous.findIndex(r => r.a === 'copper' && r.b === 'bitcoin')); }
+    sel.innerHTML = c.famous.map((r, i) => `<option value="${i}"${i === pairIdx ? ' selected' : ''}>${esc(lbl(r.a))} vs ${esc(lbl(r.b))}</option>`).join('');
+    $('#pairCard').innerHTML = pairCard(c.famous[pairIdx]);
+    const opts = cur => c.nodes.map(n => `<option value="${esc(n)}"${n === cur ? ' selected' : ''}>${esc(lbl(n))}</option>`).join('');
+    $('#anyA').innerHTML = opts(anyA); $('#anyB').innerHTML = opts(anyB);
+    renderAny();
+    const tp = (c.top_pairs || []).filter(p => p.ex_spx != null).sort((a, b) => Math.abs(b.ex_spx) - Math.abs(a.ex_spx)).slice(0, 12);
+    $('#topPairs').innerHTML = `<table><thead><tr><th>Pair</th><th>Weekly</th><th>Ex-S&amp;P</th><th>Yearly range</th></tr></thead><tbody>${tp.map(p => `<tr><td>${esc(lbl(p.a))} · ${esc(lbl(p.b))}</td><td class="num">${sgn(p.weekly_corr)}</td><td class="num">${sgn(p.ex_spx)}</td><td class="num">${sgn(p.year_min)}<br>${sgn(p.year_max)}</td></tr>`).join('')}</tbody></table>`;
+    $('#topPairs').querySelector('table').style.minWidth = '0';
+  }
+  function renderAny() {
+    const c = LIVE.corr; if (!c) return;
+    const ia = c.nodes.indexOf(anyA), ib = c.nodes.indexOf(anyB);
+    if (ia < 0 || ib < 0) return;
+    if (ia === ib) { $('#anyOut').textContent = 'Pick two different assets.'; return; }
+    const v = c.matrix[ia][ib];
+    const fi = c.famous.findIndex(r => (r.a === anyA && r.b === anyB) || (r.a === anyB && r.b === anyA));
+    $('#anyOut').innerHTML = v == null ? 'Not enough overlapping history.' : `Weekly correlation since ${esc(c.since.slice(0, 4))}: <b>${sgn(v)}</b>, ${strength(v)}${v < 0 ? ' and opposite' : ''}.${fi >= 0 ? ` <button class="more" type="button" id="openPair">Open the full test</button>` : ''}`;
+    const op = $('#openPair'); if (op) op.addEventListener('click', () => { pairIdx = fi; renderCorr(); $('#corr').scrollIntoView({ block: 'start' }); });
+  }
+  $('#pairSel').addEventListener('change', e => { pairIdx = Number(e.target.value); renderCorr(); });
+  $('#anyA').addEventListener('change', e => { anyA = e.target.value; renderAny(); });
+  $('#anyB').addEventListener('change', e => { anyB = e.target.value; renderAny(); });
+
+  // ---------- stock lookup ----------
+  const STK = { index: null, factors: null, shards: {}, current: null, factor: 'oil', db: null };
+  const fLabel = f => (STK.factors && STK.factors.factors && STK.factors.factors[f] ? STK.factors.factors[f].label : f);
+  function stockRow(sym, extra) {
+    const s = STK.index && STK.index.stocks[sym];
+    return `<button type="button" data-stock="${esc(sym)}">${esc(sym)}</button> <span class="muted">${esc(s ? s[0] : '')}</span>${extra || ''}`;
+  }
+  async function openStock(sym) {
+    if (!STK.index || !STK.index.stocks[sym] || !STK.db) return;
+    const shard = STK.index.stocks[sym][3];
+    const key = `s${String(shard).padStart(2, '0')}`;
+    $('#stockCard').innerHTML = '<p class="muted">Loading&hellip;</p>';
+    try {
+      if (!STK.shards[key]) { const snap = await STK.db.doc(`stocks/${key}`).get(); STK.shards[key] = snap.exists ? snap.data().profiles : {}; }
+    } catch (e) { $('#stockCard').innerHTML = '<p class="empty">Could not load that profile. Try again in a moment.</p>'; return; }
+    const p = STK.shards[key][sym];
+    STK.current = sym;
+    $('#stockCard').innerHTML = p ? stockCard(sym, p) : '<p class="empty">No profile for that stock.</p>';
+    bindStockButtons($('#stockCard'));
+  }
+  function stockCard(sym, p) {
+    const ex = p.exposures || [];
+    const sens = x => x.f === 'rates' ? `${sgn(x.beta * 10)}% per 0.1 pt` : x.f === 'gpr' || x.f === 'vix' ? `${sgn(x.beta * 10)}% per 10% rise` : `${sgn(x.beta)}% per 1%`;
+    const exRows = ex.length ? `<table><thead><tr><th>Factor</th><th>Link</th><th>Corr.</th><th>Sensitivity</th><th>By third</th></tr></thead><tbody>${ex.map(x => `<tr><td><b>${esc(x.label)}</b>${x.hidden ? ' <span class="tag mixed">hidden</span>' : ''}</td><td>${x.cls === 'robust' ? '<span class="skill-yes">robust</span>' : '<span class="muted">likely</span>'} <span class="muted">t ${x.t}</span></td><td class="num"><span class="mv ${x.rho >= 0 ? 'up' : 'down'}">${sgn(x.rho)}</span></td><td class="num">${sens(x)}</td><td class="num muted">${x.thirds.map(sgn).join(' ')}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No exposure beyond its market and sector passed the tests. Its moves are mostly the market, its sector, and company news.</p>';
+    const mv = (p.moves || []).map(m => {
+      const drv = (m.drivers || []).map(d => `<span class="nchip" title="${esc(fLabel(d[0]))} z ${d[2]}">${d[3] ? '✓ ' : ''}${esc(fLabel(d[0]))} ${sgn(d[1])}${d[0] === 'rates' ? ' pt' : '%'}</span>`).join(' ');
+      const evs = (m.events || []).map(t => `<span class="muted">• ${esc(t)}</span>`).join('<br>');
+      const note = !drv && !evs && !(m.gpr_z && Math.abs(m.gpr_z) >= 2) ? '<span class="muted">No commodity, macro or logged event that day: most likely company news (results, guidance, a deal or a ruling).</span>' : '';
+      return `<div class="ev"><div class="meta"><span class="d">${fmtDate(m.d)}</span><span class="mv ${m.z >= 0 ? 'up' : 'down'}"><b>${m.ret != null ? sgn(m.ret) + '%' : ''}</b></span><span>${Math.abs(m.z)}σ beyond market and sector</span>${m.mkt != null ? `<span>market ${sgn(m.mkt)}%</span>` : ''}${m.gpr_z != null && Math.abs(m.gpr_z) >= 2 ? `<span>geopolitical risk ${sgn(m.gpr_z)}σ</span>` : ''}</div>${drv ? `<div class="nodes">${drv}</div>` : ''}${evs}${note}</div>`;
+    }).join('');
+    return `<p class="eyebrow">${esc(p.index)} · ${esc(p.sector)}${p.industry && p.industry !== p.sector ? ' · ' + esc(p.industry) : ''}</p><h3>${esc(p.name)} <span class="muted" style="font-family:var(--mono);font-size:.9rem">${esc(sym)}</span></h3>
+      <p class="small muted">Market beta ${p.beta_mkt}${p.beta_sector != null ? `, sector beta ${p.beta_sector}` : ''} · ${p.weeks} weeks of data. Each factor below is measured on the part of the stock's weekly moves its market and sector do not explain, and must hold its sign in all three thirds of the sample.</p>
+      <div class="sig-table">${exRows}</div>
+      <h4 style="margin-top:6px">Biggest surprises since 2012 and what happened that day</h4>
+      <p class="muted small">✓ marks a same-day shock in a factor this stock is exposed to, in the direction that explains the move.</p>
+      <div class="feed">${mv || '<p class="empty">No daily move beyond 4σ.</p>'}</div>`;
+  }
+  function bindStockButtons(root) {
+    root.querySelectorAll('[data-stock]').forEach(b => b.addEventListener('click', () => { $('#stockQ').value = b.dataset.stock; openStock(b.dataset.stock); $('#stocks').scrollIntoView({ block: 'start' }); }));
+  }
+  function renderStocks() {
+    const ix = STK.index, fx = STK.factors;
+    if (ix) {
+      $('#stockList').innerHTML = Object.entries(ix.stocks).map(([s, v]) => `<option value="${esc(s)}">${esc(v[0])}</option>`).join('');
+    }
+    if (fx) {
+      $('#stocksAsof').textContent = `Weekly data since ${fx.since} · computed ${fmtDate(fx.asof)}`;
+      $('#stocksLead').innerHTML = `<b>${ix ? ix.count : ''}</b> stocks tested against <b>${Object.keys(fx.factors).length}</b> factors (${fx.tests.toLocaleString('en-US')} tests). <b>${fx.counts.robust}</b> robust and <b>${fx.counts.likely}</b> likely exposures passed; by luck alone about ${fx.expected_false.robust} robust and ${fx.expected_false.likely} likely would. <b>${fx.counts.hidden}</b> are exposures the stock's sector would not normally have. These describe how stocks move with each factor; like the correlations above, they do not predict next week.`;
+      const fs = Object.keys(fx.by_factor || {}).sort((a, b) => fLabel(a).localeCompare(fLabel(b)));
+      if (!fs.includes(STK.factor)) STK.factor = fs[0];
+      $('#factorSel').innerHTML = fs.map(f => `<option value="${esc(f)}"${f === STK.factor ? ' selected' : ''}>${esc(fLabel(f))} (${fx.by_factor[f].length})</option>`).join('');
+      renderFactorList();
+      $('#hiddenList').innerHTML = `<table><tbody>${(fx.hidden || []).slice(0, 15).map(h => `<tr><td>${stockRow(h.sym)}<br><span class="muted small">${esc(h.sector)}</span></td><td>${esc(h.label)}</td><td class="num"><span class="mv ${h.rho >= 0 ? 'up' : 'down'}">${sgn(h.rho)}</span></td></tr>`).join('')}</tbody></table>`;
+      $('#hiddenList table').style.minWidth = '0';
+      bindStockButtons($('#hiddenList'));
+    }
+  }
+  // ---------- event screener ----------
+  const SCR = { data: null, group: 'all', sector: 'all' };
+  const GROUPS = {
+    uslarge: ix => ix.includes('S&P 500'), usmid: ix => ix.includes('S&P 400') || ix.includes('S&P 600'),
+    nasdaq: ix => ix.includes('Nasdaq'), inlarge: ix => ix.includes('Nifty 50') || ix.includes('Sensex'),
+    insmall: ix => !ix.includes('Nifty 50') && !ix.includes('Sensex') && ix.some(x => x.startsWith('Nifty')), global: ix => ix.includes('Global'),
+  };
+  function renderScreen() {
+    const d = SCR.data; if (!d) return;
+    $('#screenAsof').textContent = `${d.events_used} events in the window · ${d.stocks_scored.toLocaleString('en-US')} stocks with an exposed factor · updated ${ago(d.updated)}`;
+    const all = d.up.concat(d.down);
+    const sectors = [...new Set(all.map(r => r.sector))].sort();
+    const ss = $('#scrSector');
+    ss.innerHTML = '<option value="all">All sectors</option>' + sectors.map(s => `<option value="${esc(s)}"${s === SCR.sector ? ' selected' : ''}>${esc(s)}</option>`).join('');
+    const keep = r => (SCR.group === 'all' || GROUPS[SCR.group](r.indexes || [])) && (SCR.sector === 'all' || r.sector === SCR.sector);
+    const fl = f => (d.factors && d.factors[f]) || f;
+    const item = (r, side) => `<div class="res-item"><span class="res-top"><span class="res-name"><button type="button" data-stock="${esc(r.sym)}" style="background:none;border:none;padding:0;font-weight:600">${esc(r.sym)}</button> <span class="muted" style="font-weight:400">${esc(r.name)}</span></span><span class="res-str">${Math.round(Math.tanh(Math.abs(r.score)) * 100)}</span></span><span class="bar"><i style="width:${Math.round(Math.tanh(Math.abs(r.score)) * 100)}%"></i></span><span class="res-path">via ${r.factors.map(f => `${esc(fl(f.f))} (corr ${sgn(f.rho)}, ${esc(f.cls)})`).join('; ')}</span>${r.events.length ? `<span class="res-path">${r.events.slice(0, 2).map(e => { const u = safeUrl(e.url); return u ? `<a href="${esc(u)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(e.title)}</a>` : esc(e.title); }).join(' · ')}</span>` : ''}<span style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag">${esc(r.sector)}</span><span class="tag ev">${esc((r.indexes || []).join(', '))}</span></span></div>`;
+    const up = d.up.filter(keep).slice(0, 25), down = d.down.filter(keep).slice(0, 25);
+    $('#screenCols').innerHTML = `<div class="res-col up"><h3>▲ Exposed positively <span class="tag">${up.length}</span></h3>${up.map(r => item(r, 'up')).join('') || '<p class="empty">None in this filter.</p>'}</div><div class="res-col down"><h3>▼ Exposed negatively <span class="tag">${down.length}</span></h3>${down.map(r => item(r, 'down')).join('') || '<p class="empty">None in this filter.</p>'}</div>`;
+    bindStockButtons($('#screenCols'));
+  }
+  $('#scrGroup').addEventListener('change', e => { SCR.group = e.target.value; renderScreen(); });
+  $('#scrSector').addEventListener('change', e => { SCR.sector = e.target.value; renderScreen(); });
+  function renderFactorList() {
+    const fx = STK.factors; if (!fx) return;
+    const rows = (fx.by_factor[STK.factor] || []).slice(0, 12);
+    $('#factorList').innerHTML = `<table><tbody>${rows.map(r => `<tr><td>${stockRow(r.sym)}${r.hidden ? ' <span class="tag mixed">hidden</span>' : ''}</td><td class="num"><span class="mv ${r.rho >= 0 ? 'up' : 'down'}">${sgn(r.rho)}</span></td><td class="muted small">${esc(r.cls)}</td></tr>`).join('')}</tbody></table>`;
+    $('#factorList table').style.minWidth = '0';
+    bindStockButtons($('#factorList'));
+  }
+  $('#factorSel').addEventListener('change', e => { STK.factor = e.target.value; renderFactorList(); });
+  $('#stockQ').addEventListener('change', e => {
+    const q = e.target.value.trim(); if (!STK.index) return;
+    const up = q.toUpperCase();
+    let sym = STK.index.stocks[up] ? up : null;
+    if (!sym) { const hit = Object.entries(STK.index.stocks).find(([s, v]) => v[0].toLowerCase().includes(q.toLowerCase())); sym = hit ? hit[0] : null; }
+    if (sym) { e.target.value = sym; openStock(sym); } else $('#stockCard').innerHTML = '<p class="empty">No stock matches. Try a ticker such as XOM or a name such as Hershey.</p>';
+  });
+
+  // ---------- my portfolio ----------
+  const PF = { holdings: [], ref: null, userId: null, version: 0 };
+  async function getProfile(sym) {
+    if (!STK.index || !STK.index.stocks[sym] || !STK.db) return null;
+    const key = `s${String(STK.index.stocks[sym][3]).padStart(2, '0')}`;
+    if (!STK.shards[key]) { const snap = await STK.db.doc(`stocks/${key}`).get(); STK.shards[key] = snap.exists ? snap.data().profiles : {}; }
+    return STK.shards[key][sym] || null;
+  }
+  function parseHoldings(text) {
+    const out = [], seen = new Set();
+    String(text || '').split(/[,\n;]+/).forEach(part => {
+      const m = part.trim().match(/^([A-Za-z0-9.^&\-]+)\s*[:=x]?\s*([\d.]+)?\s*%?$/);
+      if (!m) return;
+      const t = m[1].toUpperCase();
+      if (seen.has(t) || t.length > 20) return;
+      seen.add(t);
+      out.push({ t, w: m[2] ? Math.max(Number(m[2]), 0) : null });
+    });
+    return out.slice(0, 60);
+  }
+  function resolveTicker(t) {
+    const ix = STK.index ? STK.index.stocks : {};
+    const cand = [t, t.replace(/\.(?=[A-Z]$)/, '-'), `${t}.NS`, t.replace(/\.BO$/, '.NS')];
+    for (const c of cand) if (ix[c]) return { kind: 'stock', sym: c };
+    const items = (LIVE.signals && LIVE.signals.items) || {};
+    for (const [node, s] of Object.entries(items)) if (String(s.symbol).toUpperCase() === t) return { kind: 'node', node, sym: t };
+    return { kind: 'none', sym: t };
+  }
+  function eventScore(profile) {
+    const ev = (SCR.data && SCR.data.events_fp) || [];
+    const exp = {}; (profile.exposures || []).forEach(x => { exp[x.f] = x; });
+    let total = 0; const byEv = [], byF = {};
+    ev.forEach(e => {
+      let c = 0;
+      for (const [f, v] of Object.entries(e.fp || {})) { const x = exp[f]; if (x) { const k = v * x.rho * (x.cls === 'robust' ? 1 : 0.6); c += k; byF[f] = (byF[f] || 0) + k; } }
+      if (Math.abs(c) > 0.002) { byEv.push({ e, c }); total += c; }
+    });
+    byEv.sort((a, b) => Math.abs(b.c) - Math.abs(a.c));
+    return { total, events: byEv, factors: byF };
+  }
+  async function analysePortfolio() {
+    const out = $('#pfOut');
+    if (!PF.holdings.length) { out.innerHTML = '<p class="empty">Paste your holdings above and choose Save and analyse.</p>'; return; }
+    if (!STK.index || !SCR.data) { out.innerHTML = '<p class="empty">Waiting for the stock profiles and screener data to load.</p>'; return; }
+    out.innerHTML = '<p class="muted">Analysing&hellip;</p>';
+    const rows = [];
+    for (const h of PF.holdings) {
+      const r = resolveTicker(h.t);
+      let p = null;
+      try { p = r.kind === 'stock' ? await getProfile(r.sym) : null; } catch (e) { p = null; }
+      rows.push({ ...h, ...r, p, score: p ? eventScore(p) : null });
+    }
+    const covered = rows.filter(r => r.p);
+    const wsum = rows.reduce((s, r) => s + (r.w == null ? 1 : r.w), 0) || 1;
+    rows.forEach(r => { r.wt = (r.w == null ? 1 : r.w) / wsum; });
+    const fp = SCR.data.factor_pressure || {};
+    const fl = f => (SCR.data.factors && SCR.data.factors[f]) || fLabel(f);
+    // portfolio-level factor sensitivities: weight x correlation, summed over covered holdings
+    const fs = {};
+    covered.forEach(r => (r.p.exposures || []).forEach(x => { fs[x.f] = (fs[x.f] || 0) + r.wt * x.rho * (x.cls === 'robust' ? 1 : 0.6); }));
+    const fsRows = Object.entries(fs).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 8);
+    const maxFs = Math.max(0.01, ...fsRows.map(r => Math.abs(r[1])));
+    // events touching the most of the portfolio
+    const evAgg = {};
+    covered.forEach(r => r.score.events.forEach(({ e, c }) => { const a = evAgg[e.id] || (evAgg[e.id] = { e, c: 0, n: 0 }); a.c += r.wt * c; a.n += 1; }));
+    const evRows = Object.values(evAgg).sort((a, b) => Math.abs(b.c) - Math.abs(a.c)).slice(0, 6);
+    const total = covered.reduce((s, r) => s + r.wt * r.score.total, 0);
+    const neg = covered.filter(r => r.score.total < -0.02).length, pos = covered.filter(r => r.score.total > 0.02).length;
+    // scores add up across many events, so they are shown on a bounded -100..+100 scale
+    const pr = v => `<span class="mv ${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${Math.round(Math.tanh(v) * 100)}</span>`;
+    const holdRows = rows.slice().sort((a, b) => (a.score ? 0 : 1) - (b.score ? 0 : 1) || (a.score ? a.score.total : 0) - (b.score ? b.score.total : 0)).map(r => {
+      if (r.kind === 'node') {
+        const s = LIVE.signals.items[r.node]; const h20 = s && s.h20;
+        return `<tr><td><b>${esc(r.t)}</b></td><td>${esc(BY[r.node] ? BY[r.node].label : r.node)} <span class="muted small">(fund or commodity on the map)</span></td><td class="num">${pct(r.wt)}</td><td class="num muted">–</td><td colspan="2" class="small">Model: ${h20 ? `${pct(h20.prob_up)} chance higher in 20 days, ${h20.has_skill ? 'beat naive in testing' : 'no proven skill'}` : 'no model result'}. <button class="more" type="button" data-go="${esc(r.node)}">Open on the map</button></td></tr>`;
+      }
+      if (!r.p) return `<tr><td><b>${esc(r.t)}</b></td><td class="muted" colspan="5">Not covered yet (not in the stock universe, or under 3 years of history).</td></tr>`;
+      const ex = (r.p.exposures || []).slice(0, 3).map(x => `${esc(x.label)} ${sgn(x.rho)}`).join('; ') || '<span class="muted">none beyond market and sector</span>';
+      const ev = r.score.events.slice(0, 2).map(({ e, c }) => { const u = safeUrl(e.url); const t = esc(String(e.title).slice(0, 90)); return `${pr(c)} ${u ? `<a href="${esc(u)}" target="_blank" rel="noopener" style="color:var(--accent)">${t}</a>` : t}`; }).join('<br>') || '<span class="muted">no current event reaches its exposures</span>';
+      return `<tr><td><button type="button" data-stock="${esc(r.sym)}">${esc(r.sym)}</button></td><td>${esc(r.p.name)}<br><span class="muted small">${esc(r.p.sector)}</span></td><td class="num">${pct(r.wt)}</td><td class="num">${pr(r.score.total)}</td><td class="small">${ex}</td><td class="small">${ev}</td></tr>`;
+    }).join('');
+    out.innerHTML = `<div class="stats" style="margin-bottom:12px">
+        <div class="stat"><span class="k">Holdings covered</span><span class="v">${covered.length} of ${rows.length}</span><span class="s">${rows.filter(r => r.kind === 'node').length} matched to funds on the map</span></div>
+        <div class="stat"><span class="k">Net news pressure</span><span class="v">${pr(total)}</span><span class="s">weighted across covered holdings; 0 is neutral</span></div>
+        <div class="stat"><span class="k">Under negative pressure</span><span class="v">${neg}</span><span class="s">holdings, vs ${pos} under positive pressure</span></div>
+      </div>
+      <div class="corr-grid">
+        <div class="panel"><h4>Holdings, most negative news pressure first</h4><div class="sig-table"><table><thead><tr><th>Ticker</th><th>Company</th><th>Weight</th><th>Pressure</th><th>Main exposures (corr.)</th><th>Events behind it</th></tr></thead><tbody>${holdRows}</tbody></table></div></div>
+        <div class="panel">
+          <h4>What your portfolio leans on, beyond the market</h4>
+          <p class="muted small">Weighted sum of each holding's measured exposure. The arrow is the direction current news is pushing that factor.</p>
+          ${fsRows.length ? fsRows.map(([f, v]) => { const w = Math.abs(v) / maxFs * 50; const push = fp[f] || 0; return `<div class="prow"><span>${esc(fl(f))} ${Math.abs(push) > 0.05 ? `<span class="mv ${push > 0 ? 'up' : 'down'}" title="news pushing it ${push > 0 ? 'up' : 'down'}">${arrow(push)}</span>` : ''}</span><span class="pbar">${v >= 0 ? `<i style="left:50%;width:${w}%;background:var(--accent)"></i>` : `<i style="right:50%;width:${w}%;background:var(--accent)"></i>`}</span><span class="pv">${sgn(v)}</span></div>`; }).join('') : '<p class="empty">No measured exposures among your covered holdings.</p>'}
+          <h4 style="margin-top:8px">Events touching the most of your portfolio</h4>
+          ${evRows.length ? evRows.map(a => { const u = safeUrl(a.e.url); const t = esc(String(a.e.title).slice(0, 110)); return `<div class="ev"><div class="meta"><span class="d">${esc(ago(a.e.ts))}</span>${pr(a.c)}<span>${a.n} ${a.n === 1 ? 'holding' : 'holdings'}</span></div>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${t}</a>` : `<b>${t}</b>`}</div>`; }).join('') : '<p class="empty">No current event reaches your holdings’ measured exposures.</p>'}
+        </div>
+      </div>`;
+    bindStockButtons(out);
+    out.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { select(b.dataset.go); $('#map').scrollIntoView({ block: 'start' }); }));
+  }
+  async function savePortfolio() {
+    PF.holdings = parseHoldings($('#pfInput').value);
+    const doc = { holdings: PF.holdings, text: $('#pfInput').value.slice(0, 4000) };
+    if (PF.ref) {
+      try { await PF.ref.set(doc); $('#pfStatus').textContent = 'Saved privately'; }
+      catch (e) { $('#pfStatus').textContent = 'Could not save to your private storage; kept on this device only'; try { localStorage.setItem('ripple-portfolio', JSON.stringify(doc)); } catch (_) {} }
+    } else {
+      try { localStorage.setItem('ripple-portfolio', JSON.stringify(doc)); $('#pfStatus').textContent = 'Saved on this device only'; } catch (_) { $('#pfStatus').textContent = 'Not saved (storage unavailable)'; }
+    }
+    analysePortfolio();
+  }
+  $('#pfSave').addEventListener('click', savePortfolio);
+  $('#pfClear').addEventListener('click', () => { $('#pfInput').value = ''; savePortfolio(); });
+  function loadLocalPortfolio() {
+    try { const d = JSON.parse(localStorage.getItem('ripple-portfolio') || 'null'); if (d && d.text != null) { $('#pfInput').value = d.text; PF.holdings = parseHoldings(d.text); } } catch (_) {}
+  }
+  async function initPortfolio(db) {
+    loadLocalPortfolio();
+    let user = null;
+    try { user = window.claude && window.claude.use ? await window.claude.use('user') : null; } catch (e) { user = null; }
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) { $('#pfStatus').textContent = PF.holdings.length ? 'Loaded from this device' : 'Saved on this device only'; analysePortfolio(); return; }
+    PF.ref = db.doc(`data/users/${uid}/portfolio`);
+    try {
+      const snap = await PF.ref.get();
+      if (snap.exists) { const d = snap.data(); $('#pfInput').value = d.text || ''; PF.holdings = Array.isArray(d.holdings) ? d.holdings : parseHoldings(d.text); }
+      $('#pfStatus').textContent = 'Saved privately: only you can see it';
+    } catch (e) { $('#pfStatus').textContent = 'Private storage unavailable; using this device'; }
+    analysePortfolio();
+  }
+
+  // ---------- boot ----------
+  renderDetail();
+  renderLedger();
+  const first = R.presets[0];
+  runShock(first.label, first.seeds.map(([id, dir]) => ({ id, dir })), first.k);
+})();
+</script>

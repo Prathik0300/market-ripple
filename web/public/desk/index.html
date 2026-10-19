@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Market Ripple Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/desk/app.css">
+
+
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 13h2M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 8v5l-4 2v-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.4 8.2l2.4 6.4M15.8 7.6l-2.6 7M8.6 6.8h6.8" stroke="currentColor" stroke-width="1.6" stroke-dasharray="1.5 2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v5h5M10 13h6M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-8.5z" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="rail" aria-label="Desks">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15.5" fill="none" stroke="var(--line)" stroke-width="1.5"/><circle cx="17" cy="17" r="10" fill="none" stroke="var(--accent)" stroke-width="2" opacity=".55"/><circle cx="17" cy="17" r="4.5" fill="var(--accent)"/></svg>
+      <div><b>Market Ripple</b><span>Research console</span></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <span id="railStatus">Connecting&hellip;</span>
+      <span>Research aid. Not investment advice.</span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="where" id="where">Today</span>
+      <span class="status-dot" id="liveDot"><i></i><span id="liveText">Connecting</span></span>
+      <button class="iconbtn" type="button" id="guideBtn" aria-label="What each desk is for"><svg width="16" height="16" aria-hidden="true"><use href="#i-help"/></svg><span>Guide</span></button>
+      <a class="player" href="#arena" id="player" aria-label="Your rank and experience">
+        <span class="lvl" id="pLvl">1</span>
+        <span class="pinfo"><span class="rank" id="pRank">Intern</span><span class="xpbar"><i id="pXp" style="width:0%"></i></span></span>
+        <span class="streak" title="Days in a row with research done"><svg width="14" height="14"><use href="#i-flame"/></svg><span id="pStreak">0</span></span>
+      </a>
+    </div>
+    <nav class="mobnav" id="mobnav" aria-label="Desks"></nav>
+
+    <main class="content">
+      <!-- ================= TODAY ================= -->
+      <section class="view" id="v-home" data-title="Today">
+        <div class="hero">
+          <div class="copy">
+            <p class="eyebrow">Today</p>
+            <h1 id="heroTitle">See what today&rsquo;s news is pushing, and <em>where it ripples next</em>.</h1>
+            <p class="muted">The radar shows the last three days of world events: newer ones sit nearer the centre, bigger ones are larger dots.</p>
+            <div class="pulse-facts" id="heroFacts"></div>
+            <div class="row"><a class="btn" href="#focus">See today&rsquo;s focus list</a><a class="btn quiet" href="#arena">Make a call</a></div>
+          </div>
+          <div class="radar-wrap" id="radarWrap">
+            <canvas id="radar" aria-label="Radar of world events from the last three days" role="img"></canvas>
+            <div class="radar-tip" id="radarTip" hidden></div>
+            <div class="tip-lead" id="radarLead" hidden></div>
+            <div class="radar-legend" id="radarLegend"></div>
+          </div>
+        </div>
+
+        <div class="card guide-card" id="guideCard" hidden>
+          <div class="card-h"><h3>New here? Each desk in one line</h3><div class="row"><button class="btn quiet" type="button" id="guideOpen2">Open the full guide</button><button class="btn" type="button" id="guideGotIt">Got it</button></div></div>
+          <div class="gmini" id="guideMini"></div>
+        </div>
+
+        <div class="grid g3">
+          <div class="card">
+            <div class="card-h"><h3>Your progress</h3><a class="linkbtn" href="#arena">Arena</a></div>
+            <div class="playercard"><div class="ring" id="hRing" style="--p:0"><b id="hLvl">1</b></div><div class="pc-t"><b id="hRank">Intern</b><span class="muted small" id="hXpTxt">0 XP</span><span class="small"><span class="streak"><svg width="13" height="13"><use href="#i-flame"/></svg><span id="hStreak">0</span></span> <span class="muted">day streak</span> &middot; <span id="hBadges">0</span> <span class="muted">badges</span></span></div></div>
+            <div class="xpline"><i id="hXpLine" style="width:0%"></i></div>
+            <p class="muted small" id="hNext">Earn XP by researching: read events, run shocks, open hidden exposures and make calls.</p>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Today&rsquo;s missions</h3><span class="eyebrow" id="mBonus">+50 XP for all three</span></div>
+            <div id="missions"></div>
+          </div>
+          <div class="card" id="homePf">
+            <div class="card-h"><h3>Your portfolio</h3><a class="linkbtn" href="#portfolio">Open</a></div>
+            <div id="homePfBody"><p class="empty">Your holdings appear here once they load. Only you can see them.</p></div>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>Focus today</h3><a class="linkbtn" href="#focus">Full list</a></div>
+            <div id="homeMovers"><p class="empty">Today&rsquo;s focus list loads after the job builds it.</p></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Latest events</h3><a class="linkbtn" href="#live">All events</a></div>
+            <div class="list" id="homeFeed"><p class="empty">The newest world events appear here after the two-hourly job runs.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FOCUS ================= -->
+      <section class="view" id="v-focus" data-title="Focus" hidden>
+        <div class="vhead"><div><h2 id="fTitle">Focus for today</h2><p class="lead">Today&rsquo;s research list: what this week&rsquo;s news pushes hardest, up and down, in each market. A place to start your own research, not buy or sell calls.</p></div><div class="row" id="fMeta"></div></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p><b>Score</b> is how hard the last 14 days of events push the asset through its measured links. 100 is the strongest push on the list.</p>
+          <p><b>The three dots</b> show whether the other evidence points the same way as the news: the model (only where it beat a naive forecast on unseen years), analysts (mostly buy for a tailwind, few buys for a headwind) and the price trend (1-month move and 200-day average). A filled dot agrees, a hollow one disagrees, a dotted one has no data.</p>
+          <p>Open <b>More</b> on any card for the event behind it, the evidence and links to research it. Only the model has been tested for prediction, and prices often move on the news day itself, so treat the list as a starting point.</p>
+        </div></details>
+        <div class="seg" id="fSeg" role="group" aria-label="Asset class"><button type="button" aria-pressed="true" data-v="us">US stocks</button><button type="button" aria-pressed="false" data-v="india">India stocks</button><button type="button" aria-pressed="false" data-v="commodities">Commodities &amp; funds</button><button type="button" aria-pressed="false" data-v="crypto">Crypto</button><button type="button" aria-pressed="false" data-v="positions" id="fPosBtn" hidden>Your positions</button></div>
+        <div id="fBody"><div class="card flat"><p class="empty">Today&rsquo;s focus list appears here after the two-hourly job builds it.</p></div></div>
+        <div class="grid g2">
+          <div class="card" id="fWatch"><div class="card-h"><h3>Robinhood watchlist</h3></div><p class="empty">Today&rsquo;s list loads with the focus data.</p></div>
+          <div class="card" id="fTrack"><div class="card-h"><h3>Has following the news worked?</h3></div><p class="empty">Checks start once a focus list is a day old.</p></div>
+        </div>
+      </section>
+
+      <!-- ================= RESEARCH ================= -->
+      <section class="view" id="v-research" data-title="Research" hidden>
+        <div class="vhead"><div><h2 id="rTitle">Research</h2><p class="lead" id="rLead">One asset, everything gathered: what moves it, what is pushing it now, live Robinhood prices, and every source with its link.</p></div><div class="row" id="rActions"></div></div>
+        <div class="row"><input class="inp grow" id="rQ" list="rList" type="search" autocomplete="off" placeholder="Open a dossier: MEOH, gold, ETH, TSM" aria-label="Asset to research"><datalist id="rList"></datalist></div>
+        <div id="rBody"><div class="card flat"><p class="empty">Pick an asset above, or press Research on any card.</p></div></div>
+      </section>
+
+      <!-- ================= PORTFOLIO ================= -->
+      <section class="view" id="v-portfolio" data-title="Portfolio" hidden>
+        <div class="vhead"><div><h2>Your portfolio</h2><p class="lead">Your Robinhood, Groww, CoinDCX and mutual fund holdings, visible only to you: what each one moves with, what moved it, and how today&rsquo;s news presses on it.</p></div><span class="row" style="gap:8px;flex-wrap:wrap"><a class="btn" href="/connect">Connect investing platforms</a><a class="btn quiet" href="/activity">Trades and events</a><a class="btn quiet" href="/connectors">Connectors</a><span class="tag" id="pfAsof">private</span></span></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p><b>News now</b> is how hard the last 14 days of events push each holding through its measured links: below zero means the news leans against it.</p>
+          <p><b>Moves with</b> numbers are correlations of weekly returns over three years: 1 means it moves in step, 0 means no relation. Indian stocks are measured against the Nifty 50.</p>
+          <p>Groww, CoinDCX and mutual fund amounts are in rupees; totals and weights count them in dollars at the day&rsquo;s exchange rate. Mutual funds come from your CAMS statement and are valued at each day&rsquo;s official NAV.</p>
+          <p>The model&rsquo;s odds come from yearly retraining scored only on unseen years. None of your holdings beat a naive &ldquo;rises about as often as usual&rdquo; guess yet, so read them as close to a coin flip. This desk describes exposure; it does not tell you what to buy or sell.</p>
+        </div></details>
+        <div id="ownerPf"><div class="card flat"><p class="empty">Your holdings load here for you only. Other viewers can analyse their own tickers below.</p></div></div>
+        <details class="card more-card" id="pfPaste">
+          <summary><h3>Analyse other tickers</h3><span class="muted small" id="pfStatus"></span></summary>
+          <p class="muted small">Paste tickers, separated by commas or new lines. A number after a ticker is its weight; leave it out for equal weights. Indian tickers work without &ldquo;.NS&rdquo;. Saved privately for you.</p>
+          <div class="field"><label for="pfInput" class="eyebrow">Tickers</label><textarea id="pfInput" rows="2" placeholder="AAPL 20, MSFT 10, HINDALCO 50, TCS, GLD"></textarea></div>
+          <div class="row"><button class="btn" type="button" id="pfSave">Save and analyse</button><button class="btn quiet" type="button" id="pfClear">Clear</button></div>
+          <div id="pfOut"></div>
+        </details>
+      </section>
+
+      <!-- ================= LIVE ================= -->
+      <section class="view" id="v-live" data-title="Live desk" hidden>
+        <div class="vhead"><div><h2>Live desk</h2><p class="lead">Every world event the job has logged, newest first, and the pressure they add up to.</p></div></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p id="liveLead">Each event is tagged minor, notable or major and linked to the assets it hits first. Open <b>More</b> on an event for its summary and those assets.</p>
+          <p><b>Event pressure</b> passes recent events through the graph&rsquo;s links, fading with a three-day half-life. It summarises the news; it is not a forecast.</p>
+        </div></details>
+        <div class="row">
+          <div class="seg" id="scaleSeg" role="group" aria-label="Event size"><button type="button" aria-pressed="true" data-v="all">All</button><button type="button" aria-pressed="false" data-v="major">Major</button><button type="button" aria-pressed="false" data-v="notable">Notable</button><button type="button" aria-pressed="false" data-v="minor">Minor</button></div>
+          <select class="inp" id="catSel" aria-label="Category" style="width:auto"><option value="all">All categories</option></select>
+          <input class="inp grow" id="feedQ" type="search" placeholder="Filter events: oil, India, tariff" autocomplete="off">
+        </div>
+        <div class="grid g-main">
+          <div class="card"><div class="list" id="feed"><p class="empty">The event log appears here once the two-hourly job has run.</p></div></div>
+          <div class="card"><div class="card-h"><h3>Event pressure</h3><span class="eyebrow">3-day half-life</span></div><div id="pressure"><p class="empty">No events yet.</p></div><button class="btn ghost" type="button" id="tracePressure" hidden>Trace the last 7 days on the graph</button></div>
+        </div>
+        <details class="card more-card">
+          <summary><h3>Model check: chance of being higher</h3><span class="muted small" id="modelSummary"></span></summary>
+          <p class="muted small">Retrained every year and scored only on years it had not seen (2014&ndash;2026). Most assets show no proven skill; only rows marked &ldquo;beat naive&rdquo; did better than their usual up-rate.</p>
+          <div id="signals" class="tbl"><p class="empty">Waiting for the model results.</p></div>
+        </details>
+      </section>
+
+      <!-- ================= SCREENER ================= -->
+      <section class="view" id="v-screener" data-title="Screener" hidden>
+        <div class="vhead"><div><h2>Event screener</h2><p class="lead">About 3,100 US and Indian stocks, ranked by how exposed they are to the last 14 days of world events.</p></div><span class="muted small" id="screenAsof"></span></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p>Each event is traced through the graph to the factors it moves (oil, rates, copper and so on), then to each stock through its measured exposure to those factors. The number is the strength of that push.</p>
+          <p>It ranks exposure to the news, not future returns. Open <b>More</b> on a stock for the factors and events behind its score.</p>
+        </div></details>
+        <div class="row">
+          <select class="inp" id="scrGroup" aria-label="Market" style="width:auto">
+            <option value="all">All markets</option><option value="uslarge">US large caps (S&amp;P 500)</option><option value="usmid">US mid and small caps</option>
+            <option value="nasdaq">Other Nasdaq-listed</option><option value="inlarge">India large caps</option><option value="insmall">India mid, small and micro caps</option><option value="global">Global names</option>
+          </select>
+          <select class="inp" id="scrSector" aria-label="Sector" style="width:auto"><option value="all">All sectors</option></select>
+        </div>
+        <div class="res-cols" id="screenCols"><p class="empty">The screener appears once stock profiles load.</p></div>
+      </section>
+
+      <!-- ================= EXPLORE ================= -->
+      <section class="view" id="v-explore" data-title="Explore" hidden>
+        <div class="vhead"><div><h2>Explore</h2><p class="lead">What really moves any single stock beyond its market and sector, and whether two assets truly move together.</p></div>
+          <div class="seg" id="exSeg" role="group" aria-label="Explore section"><button type="button" aria-pressed="true" data-v="stocks">Stocks</button><button type="button" aria-pressed="false" data-v="corr">Correlations</button></div></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p id="stocksLead">Each stock&rsquo;s weekly moves are cleaned of its market, its sector and its size and style, then tested against 38 factors.</p>
+          <p><b>Robust</b> links are very unlikely to be luck; <b>likely</b> ones are probably real. Both must keep their sign in all three thirds of the sample. <b>Hidden</b> marks a link the stock&rsquo;s sector would not normally have.</p>
+          <p id="corrLead">Correlation tells you what moves together; only lead-lag tells you what comes next.</p>
+        </div></details>
+        <div id="ex-stocks" class="grid">
+          <div class="row"><input class="inp grow" id="stockQ" list="stockList" type="search" autocomplete="off" placeholder="Ticker or company: XOM, Hershey, HINDALCO.NS, Delta" aria-label="Ticker or company"><datalist id="stockList"></datalist><span class="muted small" id="stocksAsof"></span></div>
+          <div class="grid g-main">
+            <div class="card" id="stockCard"><p class="empty">Search for a stock to see what moves it beyond its market and sector.</p></div>
+            <div class="grid">
+              <div class="card"><div class="card-h"><h3>Most exposed to a factor</h3></div><select class="inp" id="factorSel" aria-label="Factor"></select><div id="factorList" class="tbl"></div></div>
+              <details class="card more-card"><summary><h3>Strongest hidden exposures</h3><span class="tag hid">hidden</span></summary><p class="muted small">Links the stock&rsquo;s sector would not normally have.</p><div id="hiddenList" class="tbl"></div></details>
+            </div>
+          </div>
+        </div>
+        <div id="ex-corr" class="grid" hidden>
+          <div class="grid g-main">
+            <div class="card"><div class="field"><label for="pairSel" class="eyebrow">Tested pair</label><select id="pairSel"></select></div><div id="pairCard"><p class="empty">Waiting for the correlation results.</p></div></div>
+            <div class="card"><h3>Any two assets</h3><div class="row"><select class="inp grow" id="anyA" aria-label="First asset"></select><select class="inp grow" id="anyB" aria-label="Second asset"></select></div><p id="anyOut" class="small"></p><details class="more"><summary><span class="m1">Strongest pairs after removing the S&amp;P 500</span><span class="m2">Hide strongest pairs</span></summary><div class="more-body"><div id="topPairs" class="tbl"></div></div></details></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= KNOWLEDGE GRAPH ================= -->
+      <section class="view" id="v-graph" data-title="Knowledge graph" hidden>
+        <div class="vhead"><div><h2>Knowledge graph</h2><p class="lead">The cause-and-effect map behind everything: 99 assets and drivers joined by 205 measured links.</p></div>
+          <div class="seg" id="gSeg" role="group" aria-label="Graph layout"><button type="button" aria-pressed="true" data-v="float">Floating</button><button type="button" aria-pressed="false" data-v="cols">Columns</button></div></div>
+        <details class="how"><summary>How to read this desk</summary><div class="how-body">
+          <p>Colours are layers: shocks, macro and money, commodities, companies and sectors, funds and coins. Dotted links flow from cause to effect.</p>
+          <p>Hover a node for details, click it to see what moves it and what it moves, and drag it anywhere (double-click to release it). Pick a shock above the graph, or click <b>Run as shock</b>, to see what tends to rise and fall.</p>
+        </div></details>
+        <div class="chips" id="presets" role="group" aria-label="Preset shocks"></div>
+        <div class="map-grid">
+          <div class="grid" style="gap:10px;min-width:0">
+            <div class="kg flow" id="kg">
+              <div class="kg-legend"><span><i style="background:var(--l0)"></i>shock</span><span><i style="background:var(--l1)"></i>macro</span><span><i style="background:var(--l2)"></i>commodity</span><span><i style="background:var(--l3)"></i>company</span><span><i style="background:var(--l4)"></i>fund or coin</span></div>
+              <div class="kg-tools"><button type="button" id="kgIn" aria-label="Zoom in">+</button><button type="button" id="kgOut" aria-label="Zoom out">&minus;</button><button type="button" id="kgFit">Fit</button><button type="button" id="kgReset">Re-settle</button></div>
+              <div class="crt" id="kgTip" hidden></div>
+              <div class="tip-lead" id="kgLead" hidden></div>
+              <div class="kg-hint" id="kgHint">Drag nodes · drag empty space to pan · pinch or ctrl-scroll to zoom</div>
+            </div>
+            <div class="graph" id="graph" hidden></div>
+          </div>
+          <aside class="card detail" id="detail" aria-live="polite"></aside>
+        </div>
+        <div class="card" id="results" aria-live="polite"></div>
+        <details class="card more-card" id="ask" hidden>
+          <summary><h3>Map any event with Claude</h3></summary>
+          <p class="muted small">Describe something that happened or might happen. Claude picks where it hits first; the graph traces the rest.</p>
+          <form id="askForm" class="row"><input class="inp grow" id="askInput" type="text" maxlength="300" value="Indonesia bans bauxite exports and Guinea's mines are hit by a coup" autocomplete="off" aria-label="Event"><button class="btn" id="askBtn" type="submit">Map it</button><button class="btn quiet" id="askStop" type="button" hidden>Stop</button></form>
+          <div class="small" id="askOut" aria-live="polite"></div>
+        </details>
+      </section>
+
+      <!-- ================= LIBRARY ================= -->
+      <section class="view" id="v-library" data-title="Episode library" hidden>
+        <div class="vhead"><div><h2>Episode library</h2><p class="lead">54 past shocks since 1973 and what they moved: the evidence behind the links on the graph.</p></div><span class="muted small" id="histCount"></span></div>
+        <div class="row"><input class="inp grow" id="q" type="search" placeholder="Search: oil, India, tariff, bitcoin, 2022" autocomplete="off" aria-label="Search episodes"><button class="chip" id="clearNode" type="button" hidden></button></div>
+        <div class="card" style="padding:0;gap:0;overflow:hidden" id="ledger"></div>
+      </section>
+
+      <!-- ================= ARENA ================= -->
+      <section class="view" id="v-arena" data-title="Arena" hidden>
+        <div class="vhead"><div><h2>Forecast arena</h2><p class="lead">A forecasting game: call whether an asset rises over the next 5 trading days, say how sure you are, and see if you can beat the model.</p></div></div>
+        <details class="how"><summary>How scoring and XP work</summary><div class="how-body">
+          <p>Calls are scored with the <b>Brier score</b>, the same test the model faces: the squared gap between how sure you were and what happened. Lower is better; always saying 50% scores 0.25. Being 90% sure and wrong costs far more than being 60% sure and wrong.</p>
+          <p id="xpRules"></p>
+        </div></details>
+        <div class="grid g-main">
+          <div class="card callbox">
+            <div class="card-h"><h3>Make a call</h3><span class="tag" id="callAsof"></span></div>
+            <div class="field"><label for="callAsset" class="eyebrow">Asset</label><select id="callAsset"></select></div>
+            <div id="callContext" class="note">Pick an asset to see its recent path and what the model says.</div>
+            <div class="dirpick" role="group" aria-label="Direction"><button type="button" class="u" id="callUp" aria-pressed="false">&#9650; Higher<small>in 5 trading days</small></button><button type="button" class="d" id="callDown" aria-pressed="false">&#9660; Lower<small>in 5 trading days</small></button></div>
+            <div class="conf"><label for="callConf" class="eyebrow">How sure are you? <span id="callConfV" class="num" style="color:var(--ink)">60%</span></label><input id="callConf" type="range" min="50" max="95" step="5" value="60"><span class="muted small">50% is a coin flip.</span></div>
+            <button class="btn" type="button" id="callGo">Lock in the call</button>
+            <p class="small muted" id="callMsg" role="status" aria-live="polite">Pick Higher or Lower, set how sure you are, then lock it in.</p>
+          </div>
+          <div class="grid">
+            <div class="card"><div class="card-h"><h3>You vs the model</h3></div><div id="vsBox"><p class="empty">Resolve a call to see your score against the model&rsquo;s.</p></div></div>
+            <div class="card"><div class="card-h"><h3>Missions today</h3></div><div id="missions2"></div></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-h"><h3>Your calls</h3><span class="muted small" id="callsCount"></span></div><div id="callsTbl" class="tbl"><p class="empty">No calls yet. Make your first one above.</p></div></div>
+        <details class="card more-card"><summary><h3>Badges</h3><span class="muted small" id="badgeCount"></span></summary><div class="badges" id="badges"></div></details>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="guide" id="guide" hidden>
+  <div class="guide-back" data-gclose></div>
+  <aside class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guideH" tabindex="-1">
+    <div class="card-h"><h2 id="guideH">What each desk is for</h2><button class="btn quiet" type="button" data-gclose>Close</button></div>
+    <p class="muted small">Market Ripple traces world events to the assets they move. Each desk looks at that from one angle.</p>
+    <div class="guide-list" id="guideList"></div>
+    <p class="note">Everything here is research: it measures exposure and tests forecasts honestly. It is not advice to buy or sell.</p>
+  </aside>
+</div>
+
+
+
+
+<script src="/desk/runtime.js"></script>
+<script src="/desk/data.js"></script>
+<script src="/desk/app.js"></script>
+</body></html>

@@ -22,6 +22,28 @@ requests. Broker connections and the platform MCP server come in later steps.
   shared with the page) into `mcp_snapshots`. `node scripts/mcp-test-server.mjs` is a pretend broker on
   127.0.0.1:8799 for testing the whole flow. It is never listed on the page; the API accepts it only when the dev server runs with
   `MCP_TEST_SERVER=1` (`supabase/functions/_shared/mcp-test-server.json`).
+- `src/app/mcp` + `src/app/oauth/consent`: the platform MCP server. A person adds `<site>/mcp` to the AI app they
+  already pay for (Claude, Claude Code, Codex, Cursor), which signs in through Supabase Auth's OAuth 2.1 server
+  (discovery at `/.well-known/oauth-protected-resource/mcp`, dynamic client registration, PKCE) and approves on
+  `/oauth/consent` with two-factor. No Anthropic key is involved. Nine read-only tools (`src/lib/assistant/context.ts`):
+  the person's portfolio and connected data, and the shared signals (with `has_skill`), feed, focus list, facts,
+  events and dossiers, each result quoted as untrusted data; server instructions carry the research-only rules
+  (`src/lib/assistant/rules.ts`). OAuth tokens carry `aal1`, so `supabase/migrations/20261019000500_platform_mcp.sql`
+  makes the consent page vouch for each approval (`vouch_oauth`), refuses every unvouched approval with a trigger on
+  `auth.oauth_authorizations` (a password alone cannot connect an app, and Auth's silent re-approval of a known app
+  needs a click on the page), and adds `read_ok()` to the SELECT policies of the tables the tools read; writes and
+  RPCs keep `mfa_ok()`, so an app's token can read but never change anything. Connected apps are listed and
+  disconnected on `/assistant` (`/api/oauth/grants`).
+- `src/app/assistant` + `src/app/api/assistant`: the in-app chat, shown only when `ANTHROPIC_API_KEY` is set (it runs
+  on the platform's key). Claude (`claude-opus-5-5`, server-side refusal fallback on) with the same rules and tools,
+  starting from the person's data and the shared documents. Rate-limited per user; needs two-factor.
+- Tests: `node --test tests/` (offline rules); `node scripts/platform-mcp-test.mjs` (two throwaway users on the local
+  Supabase, dev server on :3000: OAuth sign-in end to end, each app sees only its user's data, the token cannot
+  write, password-only and direct-to-Auth approvals are refused, disconnecting ends access);
+  `node scripts/assistant-rls-test.mjs --route` (cross-user reads, two-factor gate and the chat route against
+  `node scripts/anthropic-mock.mjs`; start the dev server with `ANTHROPIC_BASE_URL=http://127.0.0.1:8798
+  ANTHROPIC_API_KEY=mock-key`); with a real key `node scripts/assistant-refusal-eval.mjs` (advice and
+  prompt-injection cases graded by Claude).
 - `public/desk`: the desks, generated from `../map/index.html` by `npm run desk` (the claude.ai page stays the
   single source; `desk-src/runtime.js` answers its `claude.use(...)` calls from this app's API).
 
@@ -43,6 +65,10 @@ Confirmation emails land in the local inbox at http://127.0.0.1:54324.
    custom SMTP), minimum password length 12 with all character types, set the Site URL to the Vercel address and
    add `<site>/auth/confirm` as a redirect URL.
 3. Create the Vercel project with root directory `web/`, and set `NEXT_PUBLIC_SUPABASE_URL` and
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. `ANTHROPIC_API_KEY` is optional (server-only,
+   never `NEXT_PUBLIC_`): without it the in-app chat is hidden and people use their own AI app through `/mcp`.
+   For the platform MCP server: apply the migrations first (the approval trigger must exist), then in Supabase >
+   Authentication > OAuth Server turn the server on with authorization path `/oauth/consent` and dynamic client
+   registration allowed, and switch JWT signing to an asymmetric key if it is still HS256.
 4. On the Mac, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the keys file; the next 2-hourly run
    uploads the world data (or run `.venv/bin/python -m predictor.platform_sync --all`).

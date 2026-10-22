@@ -60,6 +60,53 @@
       },
       "port": 3002,
       "url": "http://localhost:3002"
+    },
+    {
+      "name": "anthropic-mock",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "web/scripts/anthropic-mock.mjs"
+      ],
+      "port": 8798
+    },
+    {
+      "name": "web-app-mock-claude",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "web",
+        "next",
+        "dev",
+        "web",
+        "-p",
+        "3003"
+      ],
+      "env": {
+        "NEXT_DIST_DIR": ".next-mock",
+        "ANTHROPIC_BASE_URL": "http://127.0.0.1:8798",
+        "ANTHROPIC_API_KEY": "mock-key"
+      },
+      "port": 3003,
+      "url": "http://localhost:3003"
+    },
+    {
+      "name": "web-app-oauth",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "web",
+        "next",
+        "dev",
+        "web",
+        "-p",
+        "3000"
+      ],
+      "env": {
+        "NEXT_DIST_DIR": ".next-oauth"
+      },
+      "port": 3000,
+      "autoPort": false,
+      "url": "http://localhost:3000"
     }
   ]
 }

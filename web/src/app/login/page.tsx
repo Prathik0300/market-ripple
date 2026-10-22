@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { safeNext } from "@/lib/next-path";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 // what an email link (via /auth/confirm) or the reset page says when it sends someone here
@@ -37,7 +38,9 @@ export default function Login() {
     }
     // one message for any other failure: never reveal whether the email exists
     if (error) return setMsg({ err: "That email and password did not match." });
-    location.assign("/mfa");
+    // keep an AI app's pending connection request (or a reset) for after the two-factor step
+    const next = safeNext(new URLSearchParams(location.search).get("next"));
+    location.assign(next ? `/mfa?next=${encodeURIComponent(next)}` : "/mfa");
   }
 
   async function resend() {

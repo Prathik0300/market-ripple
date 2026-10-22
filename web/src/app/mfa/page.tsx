@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { safeNext } from "@/lib/next-path";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 // The second step of every sign-in: a 6-digit code from the authenticator app.
@@ -25,8 +26,9 @@ export default function Mfa() {
     const { error } = await supabaseBrowser().auth.mfa.challengeAndVerify({ factorId, code: code.trim() });
     setBusy(false);
     if (error) return setErr("That code did not work. Codes change every 30 seconds; try the current one.");
-    // a password reset proves the second factor here, then goes back to set the new password
-    location.assign(new URLSearchParams(location.search).get("next") === "/auth/reset" ? "/auth/reset" : "/");
+    // a password reset proves the second factor here, then goes back to set the new password; an AI app's
+    // connection request goes back to its consent page
+    location.assign(safeNext(new URLSearchParams(location.search).get("next")) ?? "/");
   }
 
   async function signOut() {

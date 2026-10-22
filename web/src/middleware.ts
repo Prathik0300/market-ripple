@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 
 // Pages anyone may open. Everything else needs a session that has passed two-factor sign-in (aal2).
-const PUBLIC = ["/login", "/signup", "/auth/confirm", "/auth/reset"];
+// /mcp and /.well-known are the platform MCP server and its OAuth discovery: they take a bearer token, not cookies.
+const PUBLIC = ["/login", "/signup", "/auth/confirm", "/auth/reset", "/mcp", "/.well-known"];
 // Pages for people who are signed in but have not finished two-factor yet.
 const MFA_PAGES = ["/mfa", "/mfa/setup"];
 
@@ -54,7 +55,8 @@ export async function middleware(req: NextRequest) {
     if (isApi) return NextResponse.json({ error: status === 401 ? "sign in first" : "finish two-factor sign-in" }, { status });
     const url = req.nextUrl.clone();
     url.pathname = to;
-    url.search = "";
+    // an AI app's connection request survives sign-in: login and two-factor send the person back to it
+    url.search = path === "/oauth/consent" ? `?next=${encodeURIComponent(path + req.nextUrl.search)}` : "";
     return NextResponse.redirect(url);
   };
   const done = (r: NextResponse) => {

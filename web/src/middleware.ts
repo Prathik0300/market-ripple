@@ -35,6 +35,7 @@ export async function middleware(req: NextRequest) {
   const policy = csp(nonce, path.startsWith("/desk"));
   const headers = new Headers(req.headers);
   headers.set("x-nonce", nonce);
+  headers.set("x-pathname", path);   // the layout shows the app bar on signed-in pages only
   headers.set("content-security-policy", policy);
 
   let res = NextResponse.next({ request: { headers } });

@@ -1,8 +1,11 @@
-// A small fixed-window limiter per server instance. It stops runaway clients; across many instances the
-// effective limit is higher, so a shared store (for example Upstash Redis) replaces it before launch.
+import "server-only";
+import { PREFIX, withRedis } from "./redis";
+
+// Fixed-window limiter. With Redis the window is shared by every server instance (INCR + EXPIRE on first hit);
+// without it each instance counts on its own, which still stops runaway clients.
 const hits = new Map<string, { n: number; reset: number }>();
 
-export function limited(key: string, max: number, windowSec: number): boolean {
+function local(key: string, max: number, windowSec: number): boolean {
   const now = Date.now();
   const h = hits.get(key);
   if (!h || h.reset < now) {
@@ -12,4 +15,12 @@ export function limited(key: string, max: number, windowSec: number): boolean {
   }
   h.n += 1;
   return h.n > max;
+}
+
+export function limited(key: string, max: number, windowSec: number): Promise<boolean> {
+  return withRedis(async (r) => {
+    const k = `${PREFIX}rl:${key}`;
+    const [n] = (await r.multi().incr(k).expire(k, windowSec, "NX").exec()) as unknown as [number, number];
+    return Number(n) > max;
+  }, () => local(key, max, windowSec));
 }

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const supabase = await supabaseServer();
   const user = await signedInUser(supabase);
   if (!user) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  if (limited(`login:${user.id}`, 20, 3600)) return NextResponse.json({ error: "too many attempts" }, { status: 429 });
+  if (await limited(`login:${user.id}`, 20, 3600)) return NextResponse.json({ error: "too many attempts" }, { status: 429 });
   const provider = (await req.json().catch(() => ({})))?.provider;
   if (provider !== "zerodha" && provider !== "upstox") return NextResponse.json({ error: "this platform has no daily login" }, { status: 400 });
   const { data: conn } = await supabase.from("connections").select("public_id").eq("provider", provider).maybeSingle();

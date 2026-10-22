@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { signedInUser, supabaseServer } from "@/lib/supabase/server";
 import { limited } from "@/lib/ratelimit";
+import { getWorldDoc, worldVersion } from "@/lib/world";
+import { publishOwn } from "@/lib/events";
 
 // The desks read documents by path, as they did on claude.ai:
 //   world documents  feed/latest, signals/latest, stocks/s03, dossier/AAPL ...  (shared, read-only)
@@ -28,19 +30,41 @@ async function resolve(parts: string[]) {
   return { supabase, user, kind: "world" as const, path };
 }
 
-export async function GET(_req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
+// World documents come from the shared cache (src/lib/world.ts) with an ETag, so a browser that already has the current
+// version gets a 304 with no body; they may sit in the browser's own cache (no-cache: always revalidated). Personal
+// documents are read fresh and never stored by the browser.
+const WORLD_HEADERS = { "cache-control": "private, no-cache", vary: "cookie" };
+const OWN_HEADERS = { "cache-control": "private, no-store" };
+const etag = (v: number) => `W/"w${v}"`;
+
+export async function GET(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   const r = await resolve((await ctx.params).path);
   if (!r.user) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  if (limited(`read:${r.user.id}`, 600, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
-  if (r.kind === "none") return NextResponse.json({ exists: false });
-  const q = r.kind === "world"
-    ? r.supabase.from("world_docs").select("data, version").eq("path", r.path).maybeSingle()
-    : r.kind === "report"
-      ? r.supabase.from("user_reports").select("data").eq("user_id", r.user.id).eq("kind", "portfolio").maybeSingle()
-      : r.supabase.from("user_docs").select("data, version").eq("user_id", r.user.id).eq("key", r.key).maybeSingle();
+  if (await limited(`read:${r.user.id}`, 600, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
+  if (r.kind === "none") return NextResponse.json({ exists: false }, { headers: OWN_HEADERS });
+  if (r.kind === "world") {
+    const inm = req.headers.get("if-none-match");
+    if (inm) {
+      const v = await worldVersion(r.path);
+      if (v != null && inm === etag(v)) return new NextResponse(null, { status: 304, headers: { ...WORLD_HEADERS, etag: etag(v) } });
+    }
+    let doc;
+    try {
+      doc = await getWorldDoc(r.supabase, r.path);
+    } catch {
+      return NextResponse.json({ error: "read failed" }, { status: 500 });
+    }
+    if (!doc) return NextResponse.json({ exists: false }, { headers: WORLD_HEADERS });
+    if (inm === etag(doc.v)) return new NextResponse(null, { status: 304, headers: { ...WORLD_HEADERS, etag: etag(doc.v) } });
+    return NextResponse.json({ exists: true, data: doc.data, version: doc.v }, { headers: { ...WORLD_HEADERS, etag: etag(doc.v) } });
+  }
+  const q = r.kind === "report"
+    ? r.supabase.from("user_reports").select("data").eq("user_id", r.user.id).eq("kind", "portfolio").maybeSingle()
+    : r.supabase.from("user_docs").select("data, version").eq("user_id", r.user.id).eq("key", r.key).maybeSingle();
   const { data, error } = await q;
   if (error) return NextResponse.json({ error: "read failed" }, { status: 500 });
-  return NextResponse.json(data ? { exists: true, data: data.data, version: "version" in data ? data.version : 1 } : { exists: false });
+  return NextResponse.json(data ? { exists: true, data: data.data, version: "version" in data ? data.version : 1 } : { exists: false },
+    { headers: OWN_HEADERS });
 }
 
 // writes: own documents only, JSON objects up to 200 kB, from this site only
@@ -55,7 +79,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ path: strin
   const r = await resolve((await ctx.params).path);
   if (!r.user) return NextResponse.json({ error: "sign in first" }, { status: 401 });
   if (r.kind !== "own") return NextResponse.json({ error: "read-only" }, { status: 403 });
-  if (limited(`write:${r.user.id}`, 120, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
+  if (await limited(`write:${r.user.id}`, 120, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
   const raw = await req.text();
   if (raw.length > 200_000) return NextResponse.json({ error: "too large" }, { status: 413 });
   let parsed;
@@ -76,5 +100,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ path: strin
     .select("version")
     .single();
   if (error) return NextResponse.json({ error: "write failed" }, { status: 500 });
+  // the user's other tabs and devices hear about it on /api/stream (key and version only)
+  await publishOwn(r.user.id, r.key, row.version).catch(() => {});
   return NextResponse.json({ ok: true, version: row.version });
 }

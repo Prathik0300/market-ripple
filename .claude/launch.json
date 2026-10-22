@@ -60,6 +60,40 @@
       },
       "port": 3002,
       "url": "http://localhost:3002"
+    },
+    {
+      "name": "redis",
+      "runtimeExecutable": "/opt/homebrew/bin/redis-server",
+      "runtimeArgs": [
+        "--port",
+        "6379",
+        "--bind",
+        "127.0.0.1",
+        "--save",
+        "",
+        "--appendonly",
+        "no"
+      ],
+      "port": 6379
+    },
+    {
+      "name": "web-app-redis",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "web",
+        "next",
+        "dev",
+        "web",
+        "-p",
+        "3006"
+      ],
+      "env": {
+        "NEXT_DIST_DIR": ".next-redis",
+        "REDIS_URL": "redis://127.0.0.1:6379"
+      },
+      "port": 3006,
+      "url": "http://localhost:3006"
     }
   ]
 }

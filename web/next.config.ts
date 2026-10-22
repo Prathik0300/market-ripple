@@ -19,9 +19,13 @@ const config: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: security },
-      // world data and personal data are never cached by browsers or CDNs
-      { source: "/api/:path*", headers: [{ key: "Cache-Control", value: "private, no-store" }] },
-      { source: "/desk/:path*", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      // API responses are never cached by browsers or CDNs, except the documents route, which sets its own
+      // (world documents: private, revalidated by ETag; personal documents: no-store)
+      { source: "/api/:path((?!docs/).*)", headers: [{ key: "Cache-Control", value: "private, no-store" }] },
+      // the desk page is revalidated on every load; its scripts and styles carry a content hash and never change
+      { source: "/desk", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      { source: "/desk/index.html", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      { source: "/desk/assets/:file*", headers: [{ key: "Cache-Control", value: "private, max-age=31536000, immutable" }] },
     ];
   },
   async rewrites() {

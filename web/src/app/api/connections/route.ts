@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const supabase = await supabaseServer();
   const user = await signedInUser(supabase);
   if (!user) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  if (limited(`connect:${user.id}`, 10, 3600)) return NextResponse.json({ error: "too many attempts; try again later" }, { status: 429 });
+  if (await limited(`connect:${user.id}`, 10, 3600)) return NextResponse.json({ error: "too many attempts; try again later" }, { status: 429 });
   if (!sealingReady()) return NextResponse.json({ error: "connections are not switched on yet" }, { status: 503 });
   const parsed = Add.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "fill in every field" }, { status: 400 });

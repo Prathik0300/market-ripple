@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-redis/
 /out/
 
 # production

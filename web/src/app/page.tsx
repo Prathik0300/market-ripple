@@ -1,10 +1,13 @@
 import { redirect } from "next/navigation";
 import { signedInUser, supabaseServer } from "@/lib/supabase/server";
+import Link from "next/link";
 import { NODE_LABELS, areaOf, classOfSymbol, cleanInterests, type Area } from "@/lib/interests";
+import { getWorldDocs } from "@/lib/world";
 
 // The main page: what moves the user's areas first (events, news pressure and the model, focus names, fresh facts on
 // their own map nodes), then everything else the map tracks. All of it comes from the shared world documents the
-// desks read; the user's areas only choose and order. A research and impact feed, never buy or sell advice.
+// desks read (through the shared Redis cache, so a render costs one profile query); the user's areas only choose and
+// order. A research and impact feed, never buy or sell advice. New uploads re-render it live (shell-client.tsx).
 
 type NodeHit = { id: string; dir: number; why?: string };
 type Ev = { id: string; ts: string; title: string; summary?: string; scale?: string; url?: string; source?: string; nodes?: NodeHit[] };
@@ -88,7 +91,7 @@ function EventRow({ e, now, mine }: { e: Ev; now: number; mine?: Set<string> }) 
   return (
     <div className="frow">
       <div className="ftitle">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{e.title}</a> : e.title}</div>
-      <p className="small">{ago(e.ts, now)}{e.source ? ` · ${e.source}` : ""}{e.scale && e.scale !== "minor" ? ` · ${e.scale}` : ""}</p>
+      <p className="meta">{ago(e.ts, now)}{e.source ? ` · ${e.source}` : ""}{e.scale && e.scale !== "minor" ? ` · ${e.scale}` : ""}</p>
       {hits.length > 0 && (
         <div className="nodes">{hits.slice(0, 4).map((n) => (
           <span key={n.id} className={"chip " + (n.dir > 0 ? "upc" : "downc")} title={n.why}>{label(n.id)} {n.dir > 0 ? "↑" : "↓"}</span>
@@ -140,7 +143,7 @@ function FactRow({ f, now }: { f: Fact; now: number }) {
   return (
     <div className="frow">
       <div className="ftitle">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{f.text}</a> : f.text}</div>
-      <p className="small">{f.kind.replace(/_/g, " ")} · {f.source ?? "source not named"} · {ago(f.observed, now)}</p>
+      <p className="meta">{f.kind.replace(/_/g, " ")} · {f.source ?? "source not named"} · {ago(f.observed, now)}</p>
     </div>
   );
 }
@@ -148,9 +151,9 @@ function FactRow({ f, now }: { f: Fact; now: number }) {
 function Card({ title, why, empty, children }: { title: string; why: string; empty: string; children: React.ReactNode[] }) {
   return (
     <section className="pcard">
-      <h3>{title}</h3>
-      <p className="small">{why}</p>
-      {children.length ? <>{children.slice(0, SHOW)}<More rows={children.length - SHOW}>{children.slice(SHOW)}</More></> : <p>{empty}</p>}
+      <div className="prow"><h3>{title}</h3>{children.length > 0 && <span className="chip">{children.length}</span>}</div>
+      <p className="small why">{why}</p>
+      {children.length ? <>{children.slice(0, SHOW)}<More rows={children.length - SHOW}>{children.slice(SHOW)}</More></> : <p className="empty">{empty}</p>}
     </section>
   );
 }
@@ -162,13 +165,13 @@ export default async function Home() {
   if (!user) redirect("/login");
   const [prof, docs] = await Promise.all([
     supabase.from("profiles").select("interests").eq("id", user.id).maybeSingle(),
-    supabase.from("world_docs").select("path, data").in("path", DOCS),
+    getWorldDocs(supabase, DOCS).catch(() => new Map()),
   ]);
   // not asked yet: onboarding first (when the column is missing, before the migration, show the whole market instead)
   if (!prof.error && prof.data?.interests == null) redirect("/onboarding");
   const ids = cleanInterests(prof.data?.interests);
   const area = areaOf(ids);
-  const doc = <T,>(p: string) => (docs.data?.find((d) => d.path === p)?.data ?? {}) as T;
+  const doc = <T,>(p: string) => (docs.get(p)?.data ?? {}) as T;
   const feed = doc<{ updated?: string; events?: Ev[] }>("feed/latest");
   const signals = doc<Signals>("signals/latest");
   const focus = doc<Focus>("focus/latest");
@@ -206,32 +209,28 @@ export default async function Home() {
   const skillNote = s5 && s20
     ? `Tested on unseen years (${signals.test_years ?? "walk-forward"}), the model has an edge on ${s5.with_skill} of ${s5.targets} targets at 5 days and ${s20.with_skill} of ${s20.targets} at 20 days. Everywhere else its probability is no better than the usual up-rate.`
     : "Each probability is shown with its tested skill on unseen years.";
-  const noData = !docs.data?.length;
+  const noData = !docs.size;
+  const updated = [feed.updated, signals.updated, focus.updated].filter(Boolean).map((t) => Date.parse(t!)).sort((a, b) => b - a)[0];
 
   return (
     <main className="connect home">
-      <nav className="topnav">
-        <b>Market Ripple</b>
-        <span className="row">
-          <a href="/desk">Desks</a>
-          <a href="/connect">Connect</a>
-          <a href="/settings">Settings</a>
-        </span>
-      </nav>
-      <h1>What moves your areas</h1>
+      <div className="home-head">
+        <h1>What moves your areas</h1>
+        {updated ? <span className="stamp">Data from the run {ago(new Date(updated).toISOString(), now)}</span> : null}
+      </div>
       <p className="lead">World events traced through the map to the areas you follow, with what the model has and has not been able to test.
         This is a research and impact feed: it shows what is pushing on markets, not what to buy or sell.</p>
       {noData && <p className="caution">The shared world data has not been uploaded yet. It appears after the next 2-hourly run.</p>}
 
-      <h2 className="band">Your areas</h2>
       {area.picked.length ? (
-        <div className="nodes">
+        <div className="areas">
           {area.picked.map((i) => <span key={i.id} className="chip">{i.label}</span>)}
-          <a href="/settings" className="small">Change</a>
+          <Link href="/settings" className="small">Change</Link>
         </div>
       ) : (
-        <p>You have not picked any areas yet, so everything is under Across the market. <a href="/settings">Pick your areas</a></p>
+        <p>You have not picked any areas yet, so everything is under Across the market. <Link href="/settings">Pick your areas</Link></p>
       )}
+      {area.picked.length > 0 && <h2 className="band">Your areas</h2>}
       {area.picked.length > 0 && (
         <div className="grid2">
           <Card title="News moving your areas" empty="No logged event touched your areas in the feed window."

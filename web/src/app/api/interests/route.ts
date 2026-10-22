@@ -26,7 +26,7 @@ export async function PUT(req: NextRequest) {
   const supabase = await supabaseServer();
   const user = await signedInUser(supabase);
   if (!user) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  if (limited(`interests:${user.id}`, 30, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
+  if (await limited(`interests:${user.id}`, 30, 60)) return NextResponse.json({ error: "too many requests" }, { status: 429 });
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "bad request" }, { status: 400 });
   const interests = cleanInterests(parsed.data.interests);

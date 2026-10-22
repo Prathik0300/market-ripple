@@ -22,6 +22,18 @@ requests. Broker connections and the platform MCP server come in later steps.
   shared with the page) into `mcp_snapshots`. `node scripts/mcp-test-server.mjs` is a pretend broker on
   127.0.0.1:8799 for testing the whole flow. It is never listed on the page; the API accepts it only when the dev server runs with
   `MCP_TEST_SERVER=1` (`supabase/functions/_shared/mcp-test-server.json`).
+- Speed and live updates. `src/lib/world.ts` keeps the shared world documents in Redis (`REDIS_URL`) behind the
+  session check, so a page or desk read is one Redis GET instead of a database query; personal documents never go
+  there. `/api/docs` answers world documents with an ETag (a 304 with no body when the browser is current).
+  `/api/stream` is a server-sent event stream: every 20 seconds one open stream (a Redis lock) compares document
+  versions, drops changed documents from the cache and announces them on a Redis Stream (`mr:events`); a user's own
+  saves go on `mr:u:<id>`, so their other tabs refresh. One poller per server instance fans events out to its open
+  connections, and a reconnecting browser replays what it missed (Last-Event-ID). The main page re-renders itself on
+  an update; the desks (`desk-src/runtime.js`) paint from Cache Storage and refetch only the documents that changed.
+  The rate limits are shared through Redis too. Without `REDIS_URL` all of this runs in each instance's memory.
+  The desk's scripts and styles are content-hashed into `public/desk/assets/` and cached as immutable.
+- Theme "Harbor" (`globals.css`, and the desk's tokens in `../map/index.html`, where the reasoning is written): System,
+  Light and Dark from the app bar, stored in the `mr-theme` cookie and applied on the server, so there is no flash.
 - `public/desk`: the desks, generated from `../map/index.html` by `npm run desk` (the claude.ai page stays the
   single source; `desk-src/runtime.js` answers its `claude.use(...)` calls from this app's API).
 
@@ -30,6 +42,7 @@ requests. Broker connections and the platform MCP server come in later steps.
 ```bash
 npx supabase start          # Postgres, Auth and a test mail inbox in Docker
 npm run dev                 # http://localhost:3000
+redis-server                # optional: REDIS_URL=redis://127.0.0.1:6379 in .env.local (or the "web-app-redis" preview)
 ```
 
 `.env.local` needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (from `npx supabase status`).
@@ -44,5 +57,7 @@ Confirmation emails land in the local inbox at http://127.0.0.1:54324.
    add `<site>/auth/confirm` as a redirect URL.
 3. Create the Vercel project with root directory `web/`, and set `NEXT_PUBLIC_SUPABASE_URL` and
    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-4. On the Mac, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the keys file; the next 2-hourly run
+4. Add a Redis database from the Vercel Marketplace (Upstash or Redis Cloud) and set `REDIS_URL` (the `rediss://`
+   address) on the project. It is optional: without it caching, rate limits and live updates are per instance.
+5. On the Mac, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the keys file; the next 2-hourly run
    uploads the world data (or run `.venv/bin/python -m predictor.platform_sync --all`).

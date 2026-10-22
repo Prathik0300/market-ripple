@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (parsed.data.action === "sync") {
     const server = parsed.data.server;
     if (!serverById(server)) return NextResponse.json({ error: "unknown source" }, { status: 400 });
-    if (limited(`mcpsync:${user.id}`, 30, 3600)) return NextResponse.json({ error: "too many syncs; try again later" }, { status: 429 });
+    if (await limited(`mcpsync:${user.id}`, 30, 3600)) return NextResponse.json({ error: "too many syncs; try again later" }, { status: 429 });
     // the lock: false means a pull for this connection is already running, so nothing new starts
     const { data: claimed, error } = await supabase.rpc("claim_mcp_sync", { p_server: server });
     if (error) return NextResponse.json({ error: "could not start the sync" }, { status: 500 });
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (limited(`mcp:${user.id}`, 10, 3600)) return NextResponse.json({ error: "too many attempts; try again later" }, { status: 429 });
+  if (await limited(`mcp:${user.id}`, 10, 3600)) return NextResponse.json({ error: "too many attempts; try again later" }, { status: 429 });
   if (!sealingReady()) return NextResponse.json({ error: "connections are not switched on yet" }, { status: 503 });
   const s = serverById(parsed.data.server);
   if (!s || !s.ripple) return NextResponse.json({ error: "this source cannot connect to Market Ripple" }, { status: 400 });

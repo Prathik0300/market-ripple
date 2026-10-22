@@ -316,7 +316,12 @@
   const CAT_GROUP = { conflict: 0, sanctions: 0, energy: 1, metals: 2, agriculture: 2, weather: 2, 'trade-policy': 3, regulation: 3, 'central-bank': 4, 'macro-data': 4, 'supply-chain': 5, tech: 5, corporate: 5, crypto: 6, other: 6 };
   const GROUPS = ['Conflict', 'Energy', 'Metals & farms', 'Trade policy', 'Rates & data', 'Supply & tech', 'Crypto & other'];
   const RAD = { pts: [], t0: performance.now(), hover: null, raf: 0 };
-  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  // theme colours, read once per theme (the radar draws every frame) and re-read when the theme changes
+  const CSSV = {};
+  function cssVar(n) { return CSSV[n] ??= getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function themeChanged() { for (const k in CSSV) delete CSSV[k]; if (VIEW === 'home') sizeRadar(); }
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged);
+  window.addEventListener('mr-theme', themeChanged);
   function sizeRadar() {
     const c = $('#radar'), w = $('#radarWrap'); if (!c || !w.clientWidth) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);

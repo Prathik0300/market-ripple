@@ -1,0 +1,24 @@
+/* web app only (appended to the desk's styles by scripts/build-desk.mjs): the controls runtime.js adds to the top bar */
+.mr-tools { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
+.mr-tools + .player { margin-left: 0; }
+.mr-links { display: flex; gap: 6px; }
+.mr-links .btn { padding: 6px 12px; font-size: .84rem; }
+.mr-rail { padding: 0 8px; }
+.mr-rail .btn { flex: 1; }
+.mr-phone { display: none; }
+@media (max-width: 1000px) { .mr-phone { display: flex; } }
+.mr-live { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: .72rem; color: var(--muted); padding: 0 4px; }
+.mr-live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.mr-live[data-state="live"]::before { background: var(--up); box-shadow: 0 0 0 3px color-mix(in srgb, var(--up) 22%, transparent); }
+.mr-live[data-state="connecting"]::before { background: var(--gold-fill); }
+.mr-live[data-state="offline"]::before { background: var(--down); }
+.theme-switch { display: inline-flex; padding: 2px; gap: 2px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--line); }
+.theme-switch button { display: grid; place-items: center; width: 28px; height: 26px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); }
+.theme-switch button:hover { color: var(--ink); }
+.theme-switch button[aria-checked="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 2px rgba(19, 24, 28, .14); }
+.mr-toast { position: fixed; z-index: 70; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+  background: var(--tv); color: var(--tv-ink); font-size: .84rem; font-weight: 500; padding: 9px 14px; border-radius: 10px; box-shadow: var(--shadow-lg); transition: opacity .2s, transform .2s; }
+.mr-toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 640px) { .mr-live { display: none; } .mr-tools { gap: 6px; } }
+@media (prefers-reduced-motion: reduce) { .mr-toast { transition: none; } }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .18s; }

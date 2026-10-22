@@ -1,7 +1,8 @@
 // Builds public/desk/ from the single-file dashboard (../map/index.html, the claude.ai version), so both stay
 // one source. Splits the inline <style> and <script> into files, because the app's Content-Security-Policy
 // allows no inline script, and swaps a few lines of copy that only made sense for the single-owner page.
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -52,24 +53,44 @@ for (const [from, to] of swaps) {
   html = html.split(from).join(to);
 }
 
+// Every script and style goes to public/desk/assets/ under a content hash, served as immutable (next.config.ts): a
+// returning visitor loads them from the browser cache with no request at all, and a new build changes the names.
+const assets = join(out, "assets");
+mkdirSync(assets, { recursive: true });
+const keep = new Set();
+function emit(name, body) {
+  const [base, ext] = name.split(".");
+  const file = `${base}.${createHash("sha256").update(body).digest("hex").slice(0, 10)}.${ext}`;
+  writeFileSync(join(assets, file), body);
+  keep.add(file);
+  return `/desk/assets/${file}`;
+}
+const read = (f) => readFileSync(join(here, "..", "desk-src", f), "utf8");
+const cssUrl = emit("app.css", css + "\n" + read("web.css"));
+const jsUrl = emit("app.js", js);
+const dataUrl = emit("data.js", readFileSync(join(src, "data.js"), "utf8"));
+const runtimeUrl = emit("runtime.js", read("runtime.js"));
+const themeUrl = emit("theme.js", read("theme.js"));
+html = html.replace('<link rel="stylesheet" href="/desk/app.css">', `<link rel="stylesheet" href="${cssUrl}">`);
+
 const head = html.slice(0, html.indexOf("<svg"));          // title, metas, font links, stylesheet
 const body = html.slice(html.indexOf("<svg")).replace(dataTag, "");
 const page = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="${themeUrl}"></script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 ${head}
 </head><body>
 ${body}
-<script src="/desk/runtime.js"></script>
-<script src="/desk/data.js"></script>
-<script src="/desk/app.js"></script>
+<script src="${runtimeUrl}"></script>
+<script src="${dataUrl}"></script>
+<script src="${jsUrl}"></script>
 </body></html>
 `;
 // the reset above is a style element, which the CSP allows ('unsafe-inline' for styles only)
 writeFileSync(join(out, "index.html"), page);
-writeFileSync(join(out, "app.css"), css);
-writeFileSync(join(out, "app.js"), js);
-copyFileSync(join(src, "data.js"), join(out, "data.js"));
-copyFileSync(join(here, "..", "desk-src", "runtime.js"), join(out, "runtime.js"));
+// drop earlier builds' assets and the old unhashed files
+for (const f of readdirSync(assets)) if (!keep.has(f)) rmSync(join(assets, f));
+for (const f of ["app.css", "app.js", "data.js", "runtime.js"]) rmSync(join(out, f), { force: true });
 console.log(`desk built: index ${(page.length / 1024).toFixed(0)} kB, app.js ${(js.length / 1024).toFixed(0)} kB, app.css ${(css.length / 1024).toFixed(0)} kB`);

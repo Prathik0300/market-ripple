@@ -21,7 +21,10 @@ const config: NextConfig = {
       { source: "/:path*", headers: security },
       // world data and personal data are never cached by browsers or CDNs
       { source: "/api/:path*", headers: [{ key: "Cache-Control", value: "private, no-store" }] },
-      { source: "/desk/:path*", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      // the desk page is revalidated on every load; its scripts and styles carry a content hash and never change
+      { source: "/desk", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      { source: "/desk/index.html", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
+      { source: "/desk/assets/:file*", headers: [{ key: "Cache-Control", value: "private, max-age=31536000, immutable" }] },
     ];
   },
   async rewrites() {

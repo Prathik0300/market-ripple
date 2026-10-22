@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="/desk/assets/theme.e3ce28bdcd.js"></script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Market Ripple Map</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Libre+Franklin:ital,wght@0,400..800;1,400..600&display=swap">
-<link rel="stylesheet" href="/desk/app.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400..700;1,400..600&display=swap">
+<link rel="stylesheet" href="/desk/assets/app.470af89062.css">
 
 
 </head><body>
@@ -48,11 +49,6 @@
       <span class="where" id="where">Today</span>
       <span class="status-dot" id="liveDot"><i></i><span id="liveText">Connecting</span></span>
       <button class="iconbtn" type="button" id="guideBtn" aria-label="What each desk is for"><svg width="16" height="16" aria-hidden="true"><use href="#i-help"/></svg><span>Guide</span></button>
-      <a class="player" href="#arena" id="player" aria-label="Your rank and experience">
-        <span class="lvl" id="pLvl">1</span>
-        <span class="pinfo"><span class="rank" id="pRank">Intern</span><span class="xpbar"><i id="pXp" style="width:0%"></i></span></span>
-        <span class="streak" title="Days in a row with research done"><svg width="14" height="14"><use href="#i-flame"/></svg><span id="pStreak">0</span></span>
-      </a>
     </div>
     <nav class="mobnav" id="mobnav" aria-label="Desks"></nav>
 
@@ -65,7 +61,7 @@
             <h1 id="heroTitle">See what today&rsquo;s news is pushing, and <em>where it ripples next</em>.</h1>
             <p class="muted">The radar shows the last three days of world events: newer ones sit nearer the centre, bigger ones are larger dots.</p>
             <div class="pulse-facts" id="heroFacts"></div>
-            <div class="row"><a class="btn" href="#focus">See today&rsquo;s focus list</a><a class="btn quiet" href="#arena">Make a call</a></div>
+            <div class="row"><a class="btn" href="#focus">See today&rsquo;s focus list</a><a class="btn quiet" href="#portfolio">Why my portfolio moved</a></div>
           </div>
           <div class="radar-wrap" id="radarWrap">
             <canvas id="radar" aria-label="Radar of world events from the last three days" role="img"></canvas>
@@ -80,22 +76,10 @@
           <div class="gmini" id="guideMini"></div>
         </div>
 
-        <div class="grid g3">
-          <div class="card">
-            <div class="card-h"><h3>Your progress</h3><a class="linkbtn" href="#arena">Arena</a></div>
-            <div class="playercard"><div class="ring" id="hRing" style="--p:0"><b id="hLvl">1</b></div><div class="pc-t"><b id="hRank">Intern</b><span class="muted small" id="hXpTxt">0 XP</span><span class="small"><span class="streak"><svg width="13" height="13"><use href="#i-flame"/></svg><span id="hStreak">0</span></span> <span class="muted">day streak</span> &middot; <span id="hBadges">0</span> <span class="muted">badges</span></span></div></div>
-            <div class="xpline"><i id="hXpLine" style="width:0%"></i></div>
-            <p class="muted small" id="hNext">Earn XP by researching: read events, run shocks, open hidden exposures and make calls.</p>
-          </div>
-          <div class="card">
-            <div class="card-h"><h3>Today&rsquo;s missions</h3><span class="eyebrow" id="mBonus">+50 XP for all three</span></div>
-            <div id="missions"></div>
-          </div>
           <div class="card" id="homePf">
             <div class="card-h"><h3>Your portfolio</h3><a class="linkbtn" href="#portfolio">Open</a></div>
             <div id="homePfBody"><p class="empty">Your holdings appear here once they load. Only you can see them.</p></div>
           </div>
-        </div>
 
         <div class="grid g2">
           <div class="card">
@@ -256,31 +240,6 @@
         <div class="card" style="padding:0;gap:0;overflow:hidden" id="ledger"></div>
       </section>
 
-      <!-- ================= ARENA ================= -->
-      <section class="view" id="v-arena" data-title="Arena" hidden>
-        <div class="vhead"><div><h2>Forecast arena</h2><p class="lead">A forecasting game: call whether an asset rises over the next 5 trading days, say how sure you are, and see if you can beat the model.</p></div></div>
-        <details class="how"><summary>How scoring and XP work</summary><div class="how-body">
-          <p>Calls are scored with the <b>Brier score</b>, the same test the model faces: the squared gap between how sure you were and what happened. Lower is better; always saying 50% scores 0.25. Being 90% sure and wrong costs far more than being 60% sure and wrong.</p>
-          <p id="xpRules"></p>
-        </div></details>
-        <div class="grid g-main">
-          <div class="card callbox">
-            <div class="card-h"><h3>Make a call</h3><span class="tag" id="callAsof"></span></div>
-            <div class="field"><label for="callAsset" class="eyebrow">Asset</label><select id="callAsset"></select></div>
-            <div id="callContext" class="note">Pick an asset to see its recent path and what the model says.</div>
-            <div class="dirpick" role="group" aria-label="Direction"><button type="button" class="u" id="callUp" aria-pressed="false">&#9650; Higher<small>in 5 trading days</small></button><button type="button" class="d" id="callDown" aria-pressed="false">&#9660; Lower<small>in 5 trading days</small></button></div>
-            <div class="conf"><label for="callConf" class="eyebrow">How sure are you? <span id="callConfV" class="num" style="color:var(--ink)">60%</span></label><input id="callConf" type="range" min="50" max="95" step="5" value="60"><span class="muted small">50% is a coin flip.</span></div>
-            <button class="btn" type="button" id="callGo">Lock in the call</button>
-            <p class="small muted" id="callMsg" role="status" aria-live="polite">Pick Higher or Lower, set how sure you are, then lock it in.</p>
-          </div>
-          <div class="grid">
-            <div class="card"><div class="card-h"><h3>You vs the model</h3></div><div id="vsBox"><p class="empty">Resolve a call to see your score against the model&rsquo;s.</p></div></div>
-            <div class="card"><div class="card-h"><h3>Missions today</h3></div><div id="missions2"></div></div>
-          </div>
-        </div>
-        <div class="card"><div class="card-h"><h3>Your calls</h3><span class="muted small" id="callsCount"></span></div><div id="callsTbl" class="tbl"><p class="empty">No calls yet. Make your first one above.</p></div></div>
-        <details class="card more-card"><summary><h3>Badges</h3><span class="muted small" id="badgeCount"></span></summary><div class="badges" id="badges"></div></details>
-      </section>
     </main>
   </div>
 </div>
@@ -291,14 +250,14 @@
     <div class="card-h"><h2 id="guideH">What each desk is for</h2><button class="btn quiet" type="button" data-gclose>Close</button></div>
     <p class="muted small">Market Ripple traces world events to the assets they move. Each desk looks at that from one angle.</p>
     <div class="guide-list" id="guideList"></div>
-    <p class="note">Everything here is research: it measures exposure and tests forecasts honestly. It is not advice to buy or sell.</p>
+    <p class="note">Everything here is research: it measures exposure and tests the model honestly. It is not advice to buy or sell.</p>
   </aside>
 </div>
 
 
 
 
-<script src="/desk/runtime.js"></script>
-<script src="/desk/data.js"></script>
-<script src="/desk/app.js"></script>
+<script src="/desk/assets/runtime.21bcad65b7.js"></script>
+<script src="/desk/assets/data.810be9ed24.js"></script>
+<script src="/desk/assets/app.ca28fa6250.js"></script>
 </body></html>

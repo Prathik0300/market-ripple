@@ -48,8 +48,8 @@
     return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}L${X(vals.length - 1).toFixed(1)} ${h}L${X(0).toFixed(1)} ${h}Z" fill="${c}" opacity=".12"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" stroke-linejoin="round"/><circle cx="${X(vals.length - 1).toFixed(1)}" cy="${Y(vals[vals.length - 1]).toFixed(1)}" r="2.4" fill="${c}"/></svg>`;
   }
 
-  // collapsed "More" section; data-award gives XP the first time it is opened
-  const moreBox = (body, aw, meta) => body ? `<details class="more"${aw ? ` data-award="${aw}" data-meta="${esc(meta || '')}"` : ''}><summary><span class="m1">More</span><span class="m2">Less</span></summary><div class="more-body">${body}</div></details>` : '';
+  // collapsed "More" section
+  const moreBox = body => body ? `<details class="more"><summary><span class="m1">More</span><span class="m2">Less</span></summary><div class="more-body">${body}</div></details>` : '';
 
   // ======================= graph model =======================
   const LAYERS = ['Shocks & decisions', 'Macro & money', 'Commodities', 'Companies & sectors', 'Funds, ETFs & crypto'];
@@ -118,140 +118,19 @@
   const OWN = { data: null, open: null, acct: 'all' };
   const ME = { db: null, user: null, uid: null, owner: false };
 
-  // ======================= game engine =======================
-  const RANKS = [[1, 'Intern'], [3, 'Junior Analyst'], [5, 'Analyst'], [8, 'Senior Analyst'], [12, 'Strategist'], [17, 'Portfolio Strategist'], [23, 'Chief Economist']];
-  const xpFor = lv => 60 * (lv - 1) * lv; // total XP needed to reach a level
-  const levelOf = xp => { let lv = 1; while (xp >= xpFor(lv + 1)) lv++; return lv; };
-  const rankOf = lv => RANKS.filter(r => lv >= r[0]).pop()[1];
-  const ACTIONS = {
-    event: { xp: 2, cap: 15, label: 'Read an event' }, shock: { xp: 5, cap: 8, label: 'Ran a shock' }, node: { xp: 1, cap: 15, label: 'Explored the map' },
-    stock: { xp: 3, cap: 12, label: 'Opened a stock profile' }, hidden: { xp: 6, cap: 6, label: 'Found a hidden exposure' }, pair: { xp: 4, cap: 6, label: 'Tested a correlation' },
-    holding: { xp: 4, cap: 12, label: 'Reviewed a holding' }, ask: { xp: 8, cap: 5, label: 'Mapped an event with Claude' }, library: { xp: 3, cap: 5, label: 'Searched the episode library' },
-    screen: { xp: 3, cap: 10, label: 'Opened a screener stock' }, focus: { xp: 4, cap: 10, label: 'Researched a focus name' }, research: { xp: 5, cap: 10, label: 'Opened a research dossier' }, call: { xp: 12, cap: 6, label: 'Made a forecast call' }, pfscan: { xp: 5, cap: 2, label: 'Analysed a portfolio' },
-  };
-  const MISSIONS = [
-    { id: 'm_focus', a: 'focus', n: 3, t: 'Research 3 names from today\u2019s focus list', icon: 'i-compass' },
-    { id: 'm_research', a: 'research', n: 2, t: 'Open 2 research dossiers', icon: 'i-doc' },
-    { id: 'm_ev', a: 'event', n: 3, t: 'Read 3 events on the live desk', icon: 'i-radio' },
-    { id: 'm_shock', a: 'shock', n: 1, t: 'Run a shock on the knowledge graph', icon: 'i-bolt' },
-    { id: 'm_hidden', a: 'hidden', n: 1, t: 'Open a stock with a hidden exposure', icon: 'i-search' },
-    { id: 'm_call', a: 'call', n: 1, t: 'Make a forecast call in the Arena', icon: 'i-target' },
-    { id: 'm_pair', a: 'pair', n: 1, t: 'Open a correlation test', icon: 'i-search' },
-    { id: 'm_hold', a: 'holding', n: 2, t: 'Review 2 holdings in your portfolio', icon: 'i-wallet' },
-    { id: 'm_screen', a: 'screen', n: 2, t: 'Open 2 stocks from the screener', icon: 'i-filter' },
-    { id: 'm_lib', a: 'library', n: 1, t: 'Search the episode library', icon: 'i-book' },
-    { id: 'm_node', a: 'node', n: 4, t: 'Explore 4 nodes on the knowledge graph', icon: 'i-bolt' },
-  ];
-  const BADGES = [
-    { id: 'first_call', t: 'First call', d: 'Make a forecast call', ok: P => P.calls.length >= 1 },
-    { id: 'five_calls', t: 'In the habit', d: 'Make 10 calls', ok: P => P.calls.length >= 10 },
-    { id: 'calibrated', t: 'Well calibrated', d: '10 resolved calls with a Brier score under 0.23', ok: P => { const r = resolved(P); return r.length >= 10 && avg(r.map(c => c.brier)) < 0.23; } },
-    { id: 'beat_model', t: 'Beat the machine', d: '5+ resolved calls scoring better than the model', ok: P => { const r = resolved(P).filter(c => c.model_brier != null); return r.length >= 5 && avg(r.map(c => c.brier)) < avg(r.map(c => c.model_brier)); } },
-    { id: 'contrarian', t: 'Contrarian', d: 'Be right against the model', ok: P => resolved(P).some(c => c.right && c.model_p != null && (c.model_p >= 0.5) !== (c.dir > 0)) },
-    { id: 'streak3', t: 'Three-day run', d: 'Research 3 days in a row', ok: P => streakOf(P) >= 3 },
-    { id: 'streak7', t: 'Full week', d: 'Research 7 days in a row', ok: P => streakOf(P) >= 7 },
-    { id: 'hidden5', t: 'Hidden-link hunter', d: 'Open 5 hidden exposures', ok: P => (P.n.hidden || 0) >= 5 },
-    { id: 'shock10', t: 'Shock jockey', d: 'Run 10 shocks', ok: P => (P.n.shock || 0) >= 10 },
-    { id: 'news25', t: 'News hound', d: 'Read 25 events', ok: P => (P.n.event || 0) >= 25 },
-    { id: 'globe', t: 'Globetrotter', d: 'Read events from 6 regions', ok: P => (P.regions || []).length >= 6 },
-    { id: 'historian', t: 'Historian', d: 'Search the library 10 times', ok: P => (P.n.library || 0) >= 10 },
-    { id: 'sweep', t: 'Clean sweep', d: 'Finish all three missions in a day', ok: P => (P.sweeps || 0) >= 1 },
-    { id: 'deep', t: 'Deep diver', d: 'Open 15 research dossiers', ok: P => (P.n.research || 0) >= 15 },
-    { id: 'briefed', t: 'Morning briefing', d: 'Research focus names on 5 different days', ok: P => (P.focusDays || []).length >= 5 },
-    { id: 'owner', t: 'Know your book', d: 'Review every holding you own', ok: P => OWN.data && OWN.data.holdings.every(h => (P.seenHold || []).includes(h.sym)) },
-  ];
-  const avg = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
-  const resolved = P => P.calls.filter(c => c.status === 'resolved');
-  function streakOf(P) {
-    const set = new Set(P.days || []); let n = 0; const d = new Date();
-    if (!set.has(d.toISOString().slice(0, 10))) d.setUTCDate(d.getUTCDate() - 1);
-    while (set.has(d.toISOString().slice(0, 10))) { n++; d.setUTCDate(d.getUTCDate() - 1); }
-    return n;
-  }
-  const blank = () => ({ v: 1, xp: 0, n: {}, daily: { d: today(), n: {} }, days: [], badges: {}, calls: [], regions: [], sweeps: 0, seenHold: [] });
-  let PROG = blank();
-  const G = { ref: null, saving: false, dirty: false, timer: null, loaded: false };
-  function loadLocal() { try { const d = JSON.parse(localStorage.getItem('ripple-progress') || 'null'); if (d && d.v === 1) PROG = Object.assign(blank(), d); } catch (_) {} }
-  function save() {
-    G.dirty = true; clearTimeout(G.timer);
-    G.timer = setTimeout(async () => {
-      try { localStorage.setItem('ripple-progress', JSON.stringify(PROG)); } catch (_) {}
-      if (!G.ref || G.saving) return;
-      G.saving = true; G.dirty = false;
-      try { await G.ref.set(PROG); } catch (_) {}
-      G.saving = false; if (G.dirty) save();
-    }, 1200);
-  }
-  function rollDay() {
-    if (PROG.daily.d !== today()) PROG.daily = { d: today(), n: {} };
-  }
-  function todaysMissions() {
-    // a stable shuffle keyed on the date: the same three missions all day, different ones tomorrow
-    const day = today(), key = m => { let h = 2166136261; for (const c of day + m.id) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
-    return MISSIONS.filter(m => m.a !== 'holding' || OWN.data || PF.holdings.length).slice().sort((a, b) => key(a) - key(b)).slice(0, 3);
-  }
-  function award(action, meta) {
-    const A = ACTIONS[action]; if (!A) return;
-    rollDay();
-    const dn = PROG.daily.n; const before = dn[action] || 0;
-    dn[action] = before + 1; PROG.n[action] = (PROG.n[action] || 0) + 1;
-    if (meta && meta.region && !PROG.regions.includes(meta.region)) PROG.regions.push(meta.region);
-    if (meta && meta.holding && !PROG.seenHold.includes(meta.holding)) PROG.seenHold.push(meta.holding);
-    if (action === 'focus') { PROG.focusDays = PROG.focusDays || []; if (!PROG.focusDays.includes(today())) PROG.focusDays = PROG.focusDays.concat(today()).slice(-60); }
-    if (!PROG.days.includes(today())) { PROG.days.push(today()); PROG.days = PROG.days.slice(-120); }
-    let gained = before < A.cap ? A.xp : 0; const notes = [];
-    const ms = todaysMissions(); const doneBefore = PROG.daily.done || [];
-    ms.forEach(m => { if (!doneBefore.includes(m.id) && (dn[m.a] || 0) >= m.n) { doneBefore.push(m.id); gained += 30; notes.push(`Mission done: ${m.t}`); } });
-    PROG.daily.done = doneBefore;
-    if (ms.every(m => doneBefore.includes(m.id)) && !PROG.daily.swept) { PROG.daily.swept = true; PROG.sweeps = (PROG.sweeps || 0) + 1; gained += 50; notes.push('All three missions done'); }
-    gainXp(gained, notes.length ? notes[0] : A.label);
-    notes.slice(1).forEach(t => toast(t, null));
-    checkBadges();
-    save(); renderPlayer();
-  }
-  function gainXp(n, label) {
-    if (!n) return;
-    const lv0 = levelOf(PROG.xp); PROG.xp += n; const lv1 = levelOf(PROG.xp);
-    toast(label, `+${n} XP`);
-    if (lv1 > lv0) toast(`Level ${lv1}: ${rankOf(lv1)}`, 'level up');
-  }
-  function checkBadges() {
-    BADGES.forEach(b => { if (!PROG.badges[b.id]) { let ok = false; try { ok = b.ok(PROG); } catch (_) {} if (ok) { PROG.badges[b.id] = today(); PROG.xp += 40; toast(`Badge earned: ${b.t}`, '+40 XP'); } } });
-  }
-  function toast(text, xp) {
+  // ======================= notices =======================
+  function toast(text) {
     const t = document.createElement('div'); t.className = 'toast';
-    t.innerHTML = `<svg width="16" height="16" style="color:var(--gold)"><use href="#i-star"/></svg><span>${esc(text)}</span>${xp ? `<span class="tx">${esc(xp)}</span>` : ''}`;
+    t.innerHTML = `<span>${esc(text)}</span>`;
     $('#toasts').appendChild(t);
     setTimeout(() => t.remove(), 3600);
     while ($('#toasts').children.length > 4) $('#toasts').firstChild.remove();
-  }
-  function renderPlayer() {
-    rollDay();
-    const lv = levelOf(PROG.xp), lo = xpFor(lv), hi = xpFor(lv + 1), p = Math.round((PROG.xp - lo) / (hi - lo) * 100);
-    const st = streakOf(PROG), nb = Object.keys(PROG.badges).length;
-    $('#pLvl').textContent = lv; $('#pRank').textContent = rankOf(lv); $('#pXp').style.width = p + '%'; $('#pStreak').textContent = st;
-    $('#hLvl').textContent = lv; $('#hRank').textContent = rankOf(lv); $('#hRing').style.setProperty('--p', p); $('#hXpLine').style.width = p + '%';
-    $('#hXpTxt').textContent = `${PROG.xp.toLocaleString('en-US')} XP · ${hi - PROG.xp} to level ${lv + 1}`;
-    $('#hStreak').textContent = st; $('#hBadges').textContent = nb;
-    const nextRank = RANKS.find(r => r[0] > lv);
-    $('#hNext').textContent = nextRank ? `${nextRank[1]} at level ${nextRank[0]}. Missions give 30 XP each.` : 'Top rank reached.';
-    const ms = todaysMissions(); const done = PROG.daily.done || []; const dn = PROG.daily.n;
-    const mh = ms.map(m => { const d = done.includes(m.id); const c = Math.min(dn[m.a] || 0, m.n); return `<div class="mission${d ? ' done' : ''}"><span class="ic"><svg width="18" height="18"><use href="#${d ? 'i-check' : m.icon}"/></svg></span><div><div class="mt">${esc(m.t)}</div><div class="bar" style="margin-top:5px"><i style="width:${c / m.n * 100}%"></i></div></div><span class="xp">${d ? 'done' : `${c}/${m.n} · 30 XP`}</span></div>`; }).join('');
-    $('#missions').innerHTML = mh; $('#missions2').innerHTML = mh;
-    $('#mBonus').textContent = PROG.daily.swept ? 'All done today' : '+50 XP for all three';
-    renderBadges();
-  }
-  function renderBadges() {
-    const got = Object.keys(PROG.badges).length;
-    $('#badgeCount').textContent = `${got} of ${BADGES.length} earned`;
-    $('#badges').innerHTML = BADGES.map(b => { const g = PROG.badges[b.id]; return `<div class="badge${g ? ' got' : ''}"><span class="medal"><svg width="22" height="22"><use href="#${g ? 'i-star' : 'i-dot'}"/></svg></span><b>${esc(b.t)}</b><span>${esc(b.d)}</span>${g ? `<span class="tag good">${esc(fmtDate(g))}</span>` : ''}</div>`; }).join('');
-    $('#xpRules').innerHTML = Object.values(ACTIONS).map(a => `${esc(a.label)}: <b class="num">+${a.xp}</b> (up to ${a.cap} a day)`).join(' · ') + '. Each mission +30, all three +50, each badge +40. A resolved call earns up to +60 by how well calibrated it was.';
   }
 
   // ======================= router =======================
   const VIEWS = [
     ['home', 'Today', 'i-home'], ['focus', 'Focus', 'i-compass'], ['research', 'Research', 'i-doc'], ['portfolio', 'Portfolio', 'i-wallet'], ['live', 'Live desk', 'i-radio'], ['screener', 'Screener', 'i-filter'],
-    ['explore', 'Explore', 'i-search'], ['graph', 'Graph', 'i-graph'], ['library', 'Library', 'i-book'], ['arena', 'Arena', 'i-target'],
+    ['explore', 'Explore', 'i-search'], ['graph', 'Graph', 'i-graph'], ['library', 'Library', 'i-book'],
   ];
   const navHtml = VIEWS.map(([k, t, ic]) => `<a href="#${k}" data-v="${k}"><svg><use href="#${ic}"/></svg><span>${t}</span>${k === 'live' ? '<span class="pip" id="pip-live" hidden></span>' : ''}</a>`).join('');
   $('#nav').innerHTML = navHtml;
@@ -270,7 +149,6 @@
     $('#where').textContent = $('#v-' + VIEW).dataset.title;
     const ma = $(`.mobnav a[data-v="${VIEW}"]`); if (ma && ma.scrollIntoView) ma.scrollIntoView({ block: 'nearest', inline: 'center' });
     if (VIEW === 'home') sizeRadar();
-    if (VIEW === 'arena') renderArena();
     if (VIEW === 'graph') fgShow();
     if (VIEW === 'focus') renderFocus();
     if (VIEW === 'research') { if (!RES.key) { let last = null; try { last = localStorage.getItem('ripple-research'); } catch (_) {} if (last && ME.db) { RES.key = last; RES.kind = guessKind(last); loadDossier(); } } renderResearch(); if (RES.doc && !LV.key) liveLoad(); }
@@ -287,7 +165,7 @@
 
   // ======================= desk guide =======================
   const DESKS = {
-    home: ['A one-screen summary of the day: what the news is pushing, your missions and progress, and how your holdings are being pressed.', 'Start here. Tap a highlighted asset to see why it is moving.'],
+    home: ['A one-screen summary of the day: what the news is pushing and how your holdings are being pressed.', 'Start here. Tap a highlighted asset to see why it is moving.'],
     focus: ['Today\u2019s research list: the stocks, commodities, funds and coins this week\u2019s news pushes hardest, up and down, plus your own positions.', 'Pick a few names to research. Each card shows how much other evidence agrees; open More for the details.'],
     research: ['One asset, everything gathered: what moves it, what is pushing it now, live Robinhood prices, and every source with its link.', 'Press Research on any card, or type a name at the top of the desk.'],
     portfolio: ['Your Robinhood, Groww, CoinDCX and mutual fund holdings, visible only to you: what each one moves with, what moved it in the past, and how today\u2019s news presses on it.', 'Check how concentrated you are and which events your holdings are exposed to.'],
@@ -296,7 +174,6 @@
     explore: ['What really moves any single stock beyond its market and sector, and whether two assets truly move together.', 'Look up a ticker, or test a pair such as copper and bitcoin.'],
     graph: ['The cause-and-effect map behind everything: 99 assets and drivers joined by 205 measured links.', 'Hover a node for details, drag it anywhere, and run a shock to watch it spread.'],
     library: ['54 past shocks since 1973 and what they moved: the evidence behind the links on the graph.', 'Search for a commodity, country or year to see what happened last time.'],
-    arena: ['A forecasting game: call whether an asset rises over the next 5 trading days and see if you can beat the model.', 'Make a call a day to keep your streak, earn XP and unlock badges.'],
   };
   $('#guideList').innerHTML = VIEWS.map(([k, t, ic]) => `<div class="gitem"><span class="gi"><svg width="18" height="18" aria-hidden="true"><use href="#${ic}"/></svg></span><div class="gt"><b>${esc($('#v-' + k).dataset.title)}</b><p>${esc(DESKS[k][0])}</p><p class="muted small">${esc(DESKS[k][1])}</p><a href="#${k}" data-gclose>Open ${esc(t)}</a></div></div>`).join('');
   $('#guideMini').innerHTML = VIEWS.filter(([k]) => k !== 'home').map(([k, t]) => `<a href="#${k}"><b>${esc(t)}</b><span>${esc(DESKS[k][0])}</span></a>`).join('');
@@ -316,7 +193,12 @@
   const CAT_GROUP = { conflict: 0, sanctions: 0, energy: 1, metals: 2, agriculture: 2, weather: 2, 'trade-policy': 3, regulation: 3, 'central-bank': 4, 'macro-data': 4, 'supply-chain': 5, tech: 5, corporate: 5, crypto: 6, other: 6 };
   const GROUPS = ['Conflict', 'Energy', 'Metals & farms', 'Trade policy', 'Rates & data', 'Supply & tech', 'Crypto & other'];
   const RAD = { pts: [], t0: performance.now(), hover: null, raf: 0 };
-  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  // theme colours, read once per theme (the radar draws every frame) and re-read when the theme changes
+  const CSSV = {};
+  function cssVar(n) { return CSSV[n] ??= getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function themeChanged() { for (const k in CSSV) delete CSSV[k]; if (VIEW === 'home') sizeRadar(); }
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged);
+  window.addEventListener('mr-theme', themeChanged);
   function sizeRadar() {
     const c = $('#radar'), w = $('#radarWrap'); if (!c || !w.clientWidth) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -388,7 +270,7 @@
     if (reduced) drawRadar(0);
   });
   $('#radar').addEventListener('mouseleave', () => { RAD.hover = null; $('#radarTip').hidden = true; $('#radarLead').hidden = true; });
-  $('#radar').addEventListener('click', () => { if (RAD.hover) { const u = safeUrl(RAD.hover.e.url); award('event', { region: RAD.hover.e.region }); if (u) window.open(u, '_blank', 'noopener'); } });
+  $('#radar').addEventListener('click', () => { if (RAD.hover) { const u = safeUrl(RAD.hover.e.url); if (u) window.open(u, '_blank', 'noopener'); } });
   window.addEventListener('resize', () => { if (VIEW === 'home') sizeRadar(); });
 
   // ======================= home =======================
@@ -427,26 +309,15 @@
   // one delegated click handler for cross-links everywhere
   document.addEventListener('click', ev => {
     const rs = ev.target.closest('[data-research]');
-    if (rs) { if (rs.dataset.src === 'screen') award('screen'); if (rs.dataset.focus) award('focus'); openResearch(rs.dataset.research, rs.dataset.rkind); return; }
-    const fc = ev.target.closest('[data-focus]'); if (fc) award('focus');
-    const cl = ev.target.closest('[data-call]');
-    if (cl) { CALL.asset = cl.dataset.call; go('arena'); renderArena(); const sel = $('#callAsset'); if (sel) sel.value = CALL.asset; renderCallContext(); return; }
-    const a = ev.target.closest('[data-ev]'); if (a && a.tagName === 'A') award('event', { region: a.dataset.ev });
+    if (rs) { openResearch(rs.dataset.research, rs.dataset.rkind); return; }
     const g = ev.target.closest('[data-go]');
-    if (g) { if (g.dataset.ev != null) award('event', { region: g.dataset.ev }); go('graph'); select(g.dataset.go); return; }
+    if (g) { go('graph'); select(g.dataset.go); return; }
     const s = ev.target.closest('[data-stock]');
-    if (s) { if (s.dataset.src === 'screen') award('screen'); go('explore'); setEx('stocks'); $('#stockQ').value = s.dataset.stock; openStock(s.dataset.stock); return; }
+    if (s) { go('explore'); setEx('stocks'); $('#stockQ').value = s.dataset.stock; openStock(s.dataset.stock); return; }
     const h = ev.target.closest('[data-hold]');
     if (h) { go('portfolio'); openHolding(h.dataset.hold); }
   });
   function bindAll() { /* links are handled by the delegated listener */ }
-  document.addEventListener('toggle', ev => {
-    const d = ev.target;
-    if (d.tagName !== 'DETAILS' || !d.open || !d.dataset.award || d.dataset.awarded) return;
-    d.dataset.awarded = '1';
-    const a = d.dataset.award, m = d.dataset.meta;
-    award(a, a === 'event' ? { region: m } : a === 'holding' ? { holding: m } : undefined);
-  }, true);
 
   // ======================= live desk =======================
   const FEEDF = { scale: 'all', cat: 'all', q: '', all: false };
@@ -541,7 +412,6 @@
     let p = null; try { p = await getProfile(sym); } catch (e) { $('#stockCard').innerHTML = '<p class="empty">Could not load that profile. Try again in a moment.</p>'; return; }
     const first = STK.current === null; STK.current = sym;
     $('#stockCard').innerHTML = p ? stockCard(sym, p) : '<p class="empty">No profile for that stock.</p>';
-    if (p && !first) { award('stock'); if ((p.exposures || []).some(x => x.hidden)) award('hidden'); }
   }
   function stockCard(sym, p) {
     const ex = p.exposures || [];
@@ -635,9 +505,9 @@
     if (ia === ib) { $('#anyOut').textContent = 'Pick two different assets.'; return; }
     const v = c.matrix[ia][ib]; const fi = c.famous.findIndex(r => (r.a === anyA && r.b === anyB) || (r.a === anyB && r.b === anyA));
     $('#anyOut').innerHTML = v == null ? 'Not enough overlapping history.' : `Weekly correlation since ${esc(c.since.slice(0, 4))}: <b>${sgn(v)}</b>, ${strength(v)}${v < 0 ? ' and opposite' : ''}.${fi >= 0 ? ' <button class="linkbtn" type="button" id="openPair">Open the full test</button>' : ''}`;
-    const op = $('#openPair'); if (op) op.addEventListener('click', () => { pairIdx = fi; renderCorr(); award('pair'); });
+    const op = $('#openPair'); if (op) op.addEventListener('click', () => { pairIdx = fi; renderCorr(); });
   }
-  $('#pairSel').addEventListener('change', e => { pairIdx = Number(e.target.value); renderCorr(); award('pair'); });
+  $('#pairSel').addEventListener('change', e => { pairIdx = Number(e.target.value); renderCorr(); });
   $('#anyA').addEventListener('change', e => { anyA = e.target.value; renderAny(); });
   $('#anyB').addEventListener('change', e => { anyB = e.target.value; renderAny(); });
 
@@ -645,7 +515,7 @@
   let current = null, selected = null, showAll = { up: false, down: false };
   R.presets.forEach(p => {
     const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.k = p.k; b.textContent = p.label;
-    b.addEventListener('click', () => { runShock(p.label, p.seeds.map(([id, dir]) => ({ id, dir })), p.k); award('shock'); });
+    b.addEventListener('click', () => { runShock(p.label, p.seeds.map(([id, dir]) => ({ id, dir })), p.k); });
     $('#presets').appendChild(b);
   });
   function runShock(title, seeds, key) {
@@ -705,7 +575,7 @@
   const edgeEls = [...svg.querySelectorAll('.edge')];
   const nodeEls = Object.fromEntries([...svg.querySelectorAll('.node')].map(g => [g.dataset.id, g]));
   Object.values(nodeEls).forEach(g => {
-    g.addEventListener('click', () => { const id = g.dataset.id === selected ? null : g.dataset.id; select(id); if (id) award('node'); });
+    g.addEventListener('click', () => { const id = g.dataset.id === selected ? null : g.dataset.id; select(id); });
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(g.dataset.id === selected ? null : g.dataset.id); } });
   });
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && selected) select(null); });
@@ -765,11 +635,11 @@
         <h4>What it moves (${outs.length})</h4><div class="grid" style="gap:6px">${outs.length ? links(outs, 'out') : '<p class="empty">An end point: funds and coins that other items feed into.</p>'}</div>
         ${eps.length ? `<details class="more-card"><summary><h4>Past episodes (${eps.length})</h4></summary><div>${eps.map(inc => { const m = inc.m.find(x => x[0] === n.id); return `<div class="ep"><span class="num muted small">${fmtDate(inc.d)}</span><b>${esc(inc.t)}</b>${m ? `<span class="${m[1] > 0 ? 'up' : 'down'}">${arrow(m[1])} ${esc(m[2])}</span>` : '<span class="muted">This was the shock.</span>'}</div>`; }).join('')}<button class="more" type="button" id="toLedger">Show these in the library</button></div></details>` : ''}
         <p class="small muted"><b>Where it trades:</b> ${esc(n.inst)}</p>`;
-      $('#runUp').addEventListener('click', () => { runShock(`${n.label} rises`, [{ id: n.id, dir: 1 }], null); award('shock'); });
-      $('#runDown').addEventListener('click', () => { runShock(`${n.label} falls`, [{ id: n.id, dir: -1 }], null); award('shock'); });
+      $('#runUp').addEventListener('click', () => { runShock(`${n.label} rises`, [{ id: n.id, dir: 1 }], null); });
+      $('#runDown').addEventListener('click', () => { runShock(`${n.label} falls`, [{ id: n.id, dir: -1 }], null); });
       const tl = $('#toLedger'); if (tl) tl.addEventListener('click', () => { nodeFilter = n.id; renderLedger(); go('library'); });
     }
-    box.querySelectorAll('[data-sel]').forEach(b => b.addEventListener('click', () => { select(b.dataset.sel); award('node'); }));
+    box.querySelectorAll('[data-sel]').forEach(b => b.addEventListener('click', () => select(b.dataset.sel)));
   }
   // ======================= floating knowledge graph =======================
   // A small force layout: nodes repel, links act as springs, and each layer is drawn gently towards its own band
@@ -799,7 +669,7 @@
       g.addEventListener('pointerleave', () => { if (!FG.drag) fgHover(null); });
       g.addEventListener('focus', () => fgHover(p));
       g.addEventListener('blur', () => fgHover(null));
-      g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(p.id === selected ? null : p.id); award('node'); } });
+      g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(p.id === selected ? null : p.id); } });
       g.addEventListener('dblclick', ev => { ev.stopPropagation(); if (p.fixed) { p.fixed = false; p.el.classList.remove('pinned'); FG.alpha = Math.max(FG.alpha, 0.3); fgWake(); } });
     });
     EDGES.forEach((e, i) => {
@@ -892,7 +762,7 @@
   function fgUp() {
     if (FG.drag) {
       const d = FG.drag; d.p.el.classList.remove('dragging'); FG.drag = null;
-      if (!d.moved) { const id = d.p.id === selected ? null : d.p.id; select(id); if (id) award('node'); fgHover(d.p); }
+      if (!d.moved) { const id = d.p.id === selected ? null : d.p.id; select(id); fgHover(d.p); }
     }
     if (FG.pan) { FG.pan = null; FG.svg.classList.remove('panning'); }
     fgWake();
@@ -984,7 +854,6 @@
         const list = a => (Array.isArray(a) ? a : []).slice(0, 4);
         out.innerHTML = `<div class="grid" style="gap:8px"><p><b>${esc(res.headline || text)}</b></p><p><span class="eyebrow">Hits first</span><br>${seeds.map(s => `<span class="${s.dir > 0 ? 'up' : 'down'}">${arrow(s.dir)} <b>${esc(lbl(s.id))}</b></span> <span class="muted">${esc(s.why)}</span>`).join('<br>')}</p>${list(res.watch).length ? `<p><span class="eyebrow">Watch</span><br>${list(res.watch).map(esc).join(' · ')}</p>` : ''}${list(res.analogues).length ? `<p><span class="eyebrow">Analogues suggested by Claude (check before relying)</span><br>${list(res.analogues).map(a => `<b>${esc(a.when || '')}</b> ${esc(a.event || '')}: ${esc(a.outcome || '')}`).join('<br>')}</p>` : ''}${res.blind_spot ? `<p><span class="eyebrow">Possible blind spot</span><br>${esc(res.blind_spot)}</p>` : ''}</div>`;
         runShock(text.length > 80 ? text.slice(0, 78) + '…' : text, seeds.map(s => ({ id: s.id, dir: s.dir })), null);
-        award('ask');
       } catch (e) {
         const code = e && e.code;
         if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(code)) box.hidden = true;
@@ -998,7 +867,7 @@
 
   // ======================= library =======================
   let nodeFilter = null, libTimer = null;
-  $('#q').addEventListener('input', () => { renderLedger(); clearTimeout(libTimer); libTimer = setTimeout(() => { if ($('#q').value.trim().length > 2) award('library'); }, 1500); });
+  $('#q').addEventListener('input', renderLedger);
   $('#clearNode').addEventListener('click', () => { nodeFilter = null; renderLedger(); });
   function renderLedger() {
     const q = $('#q').value.trim().toLowerCase();
@@ -1101,7 +970,7 @@
         <h4>Its biggest surprise days, last 3 years</h4><div class="list">${(h.moves || []).map(moveHtml).join('') || '<p class="empty">No large surprises.</p>'}</div>
       </details></div>`;
     $('#holdClose').addEventListener('click', () => { OWN.open = null; box.innerHTML = ''; });
-    if (!quiet) { award('holding', { holding: h.sym }); box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' }); }
+    if (!quiet) { box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' }); }
   }
 
   // ======================= portfolio (pasted tickers) =======================
@@ -1145,7 +1014,6 @@
     const doc = { holdings: PF.holdings, text: $('#pfInput').value.slice(0, 4000) };
     if (PF.ref) { try { await PF.ref.set(doc); $('#pfStatus').textContent = 'Saved privately'; } catch (e) { $('#pfStatus').textContent = 'Kept on this device only'; try { localStorage.setItem('ripple-portfolio', JSON.stringify(doc)); } catch (_) {} } }
     else { try { localStorage.setItem('ripple-portfolio', JSON.stringify(doc)); $('#pfStatus').textContent = 'Saved on this device only'; } catch (_) { $('#pfStatus').textContent = 'Not saved'; } }
-    if (PF.holdings.length) award('pfscan');
     analysePortfolio(); renderHomePf();
   }
   $('#pfSave').addEventListener('click', savePortfolio);
@@ -1233,7 +1101,7 @@
       const fact = (k, v, s) => `<div class="fact"><span class="k">${k}</span><span class="v">${v}</span>${s ? `<span class="muted small">${s}</span>` : ''}</div>`;
       return `<div class="card pos" data-pos="${i}"><div class="card-h"><h3><span class="${h.kind === 'fund' ? 'fundname' : 'num'}">${esc(hlabel(h))}</span> <span class="tag">${esc(h.kind)}</span>${h.broker && h.broker !== 'robinhood' ? ` <span class="tag">${esc(BRK[h.broker])}</span>` : ''}</h3><span class="row" style="gap:8px"><span class="muted small">${c(V)} · ${pct(usdOf(h) / total)}</span>${h.kind === 'fund' ? '' : `<button class="linkbtn" type="button" data-research="${esc(short(h.sym))}" data-rkind="${esc(h.kind)}">Research</button>`}</span></div>
         <div class="facts">${known ? fact('Gain or loss', `<span class="${gain >= 0 ? 'up' : 'down'}">${sp1((P / A - 1) * 100)}</span>`, `${gain >= 0 ? '+' : '−'}${c(Math.abs(gain))}`) + fact('To break even', be > 0 ? sp1(be * 100) : 'in profit', be > 0 ? 'rise needed' : '') : fact('Gain or loss', '–', 'average cost unknown')}${fact('News now', pr(pz), 'last 14 days')}</div>
-        <details class="more" data-award="holding" data-meta="${esc(h.sym)}"><summary><span class="m1">${known ? 'Details and what-if calculator' : 'Details'}</span><span class="m2">Less</span></summary><div class="more-body">
+        <details class="more"><summary><span class="m1">${known ? 'Details and what-if calculator' : 'Details'}</span><span class="m2">Less</span></summary><div class="more-body">
           ${spark(h.c, 320, 46)}
           ${h.cost_note ? `<p class="muted small">${esc(h.cost_note)}</p>` : ''}
           <div class="facts">${fact('Price vs your average', c(P), known ? `average ${c(A)}` : 'average unknown')}${fact('From 1-year high', sp1(t.drawdown_1y), `vs 200-day ${sp1(t.vs_200d)}`)}${fact('Model, 20 days', o20 ? pct(o20.prob_up) : '–', o20 ? (o20.has_skill ? 'beat naive in testing' : 'no tested edge') : 'too little history')}${a ? fact('Analysts', `${Math.round(a.buy / (a.buy + a.hold + a.sell) * 100)}% buy`, a.target_gap != null ? `average target ${sp1(a.target_gap * 100)}` : '') : ''}${h.earnings ? fact('Next report', fmtDate(h.earnings.date), h.earnings.timing === 'pm' ? 'after the close' : h.earnings.timing === 'am' ? 'before the open' : '') : ''}</div>
@@ -1302,7 +1170,6 @@
     RES.key = key; RES.kind = kind || guessKind(key); RES.doc = null; RES.lite = false;
     if (VIEW !== 'research') RES.from = VIEW;
     try { localStorage.setItem('ripple-research', key); } catch (_) {}
-    try { award('research'); } catch (_) {}
     go('research');
     window.scrollTo({ top: 0, behavior: 'auto' });
     loadDossier().catch(err => { $('#rBody').innerHTML = `<div class="card flat"><p class="empty">This dossier could not load (${esc(err && err.message || 'unknown error')}). Try again, or open another one.</p></div>`; });
@@ -1605,9 +1472,8 @@
     const isTicker = d.kind === 'stock' || d.kind === 'crypto';
     $('#rTitle').innerHTML = isTicker ? `${esc(d.name)} <span class="muted num" style="font-size:1rem">${esc(d.key)}</span>` : esc(d.name);
     $('#rLead').textContent = d.kind === 'stock' ? [d.sector, d.index || d.market].filter(Boolean).join(' · ') : d.kind === 'crypto' ? 'Crypto, moves mostly with bitcoin' : (d.inst || KIND_WORD[d.kind]);
-    const arenaKey = d.kind !== 'stock' && BY[d.key] && LIVE.prices && LIVE.prices.series && LIVE.prices.series[d.key] ? 'n:' + d.key : d.kind === 'crypto' && (d.key === 'BTC' || d.key === 'ETH') ? 'n:' + (d.key === 'BTC' ? 'bitcoin' : 'ether') : null;
     const back = RES.from && RES.from !== 'research' ? `<button class="btn quiet" type="button" id="rBack">&larr; Back to ${esc($('#v-' + RES.from).dataset.title)}</button>` : '';
-    $('#rActions').innerHTML = `${back}${requestState(d)}${BY[d.key] ? `<button class="btn quiet" type="button" data-go="${esc(d.key)}">Open on the graph</button>` : ''}${d.kind === 'stock' && STK.index && STK.index.stocks[d.key] ? `<button class="btn quiet" type="button" data-stock="${esc(d.key)}">Exposure profile</button>` : ''}${arenaKey ? `<button class="btn quiet" type="button" data-call="${esc(arenaKey)}">Make a 5-day call</button>` : ''}`;
+    $('#rActions').innerHTML = `${back}${requestState(d)}${BY[d.key] ? `<button class="btn quiet" type="button" data-go="${esc(d.key)}">Open on the graph</button>` : ''}${d.kind === 'stock' && STK.index && STK.index.stocks[d.key] ? `<button class="btn quiet" type="button" data-stock="${esc(d.key)}">Exposure profile</button>` : ''}`;
     const fb = $('#rFind'); if (fb) fb.addEventListener('click', findMore);
     const bk = $('#rBack'); if (bk) bk.addEventListener('click', () => go(RES.from, true));
     const held = heldSet().has(d.key) || (d.proxy && heldSet().has(d.proxy));
@@ -1678,88 +1544,8 @@
     if (hit) { e.target.value = ''; openResearch(hit.key, hit.kind); } else toast(`No asset matches "${q}"`, null);
   });
 
-  // ======================= arena =======================
-  const CALL = { asset: null, dir: 0 };
-  function callAssets() {
-    const out = [];
-    const seen = new Set();
-    if (OWN.data) OWN.data.holdings.forEach(h => { if (seen.has(h.sym)) return; seen.add(h.sym); if (h.c && h.c.length > 5) out.push({ key: 'h:' + h.sym, label: `${hlabel(h)} (your holding)`, c: h.c, kind: 'price', model: (h.odds || {}).h5, grp: 'Your holdings' }); });
-    const ps = (LIVE.prices && LIVE.prices.series) || {};
-    Object.entries(ps).forEach(([node, s]) => { if (BY[node]) out.push({ key: 'n:' + node, label: lbl(node), c: s.c, kind: s.kind, model: ((LIVE.signals && LIVE.signals.items[node]) || {}).h5, grp: LAYERS[BY[node].layer] }); });
-    return out;
-  }
-  const findAsset = key => callAssets().find(a => a.key === key);
-  function renderArena() {
-    const as = callAssets(); const sel = $('#callAsset');
-    if (!as.length) { sel.innerHTML = '<option>Loading assets&hellip;</option>'; }
-    else if (sel.options.length !== as.length) {
-      const groups = {}; as.forEach(a => (groups[a.grp] = groups[a.grp] || []).push(a));
-      sel.innerHTML = Object.entries(groups).map(([g, list]) => `<optgroup label="${esc(g)}">${list.map(a => `<option value="${esc(a.key)}">${esc(a.label)}</option>`).join('')}</optgroup>`).join('');
-      if (!CALL.asset || !findAsset(CALL.asset)) CALL.asset = as[0].key;
-      sel.value = CALL.asset;
-    }
-    if (LIVE.prices) $('#callAsof').textContent = `prices to ${fmtDate(Object.values(LIVE.prices.series)[0].c.slice(-1)[0][0])}`;
-    renderCallContext(); resolveCalls(); renderCalls();
-  }
-  function renderCallContext() {
-    const a = findAsset(CALL.asset); if (!a) return;
-    const last = a.c[a.c.length - 1], prev = a.c[Math.max(0, a.c.length - 6)];
-    const ch = (last[1] / prev[1] - 1) * 100 * (a.kind === 'inverse' ? -1 : 1);
-    const m = a.model;
-    $('#callContext').innerHTML = `<div class="row" style="align-items:center">${spark(a.c, 200, 46)}<div class="small"><b>${esc(a.label)}</b><br>Last close ${a.kind === 'yield' ? last[1].toFixed(2) + '%' : last[1].toLocaleString('en-US', { maximumFractionDigits: 4 })} on ${fmtDate(last[0])} · ${a.kind === 'yield' ? `${sgn((last[1] - prev[1]))} pt` : sp1(ch)} over 5 days<br>${m ? `Model: <b>${pct(m.prob_up)}</b> chance higher in 5 days, ${m.has_skill ? '<span class="tag good">beat naive</span>' : '<span class="tag">no proven skill</span>'}` : '<span class="muted">No model forecast for this one.</span>'}</div></div>`;
-  }
-  $('#callAsset').addEventListener('change', e => { CALL.asset = e.target.value; renderCallContext(); });
-  function setDir(d) { CALL.dir = d; $('#callUp').setAttribute('aria-pressed', d > 0 ? 'true' : 'false'); $('#callDown').setAttribute('aria-pressed', d < 0 ? 'true' : 'false'); $('#callGo').classList.toggle('ready', !!d); if (d) callNote(''); }
-  // the button always answers: it says what is missing instead of sitting disabled
-  function callNote(text, kind) { const m = $('#callMsg'); m.textContent = text || 'Pick Higher or Lower, set how sure you are, then lock it in.'; m.className = 'small ' + (kind === 'warn' ? 'callwarn' : kind === 'ok' ? 'callok' : 'muted'); }
-  $('#callUp').addEventListener('click', () => setDir(1)); $('#callDown').addEventListener('click', () => setDir(-1));
-  $('#callConf').addEventListener('input', e => { $('#callConfV').textContent = e.target.value + '%'; });
-  $('#callGo').addEventListener('click', () => {
-    const a = findAsset(CALL.asset);
-    if (!a) { callNote('Prices are still loading. Try again in a moment.', 'warn'); return; }
-    if (!CALL.dir) { callNote('Pick Higher or Lower first.', 'warn'); const p = $('.dirpick'); p.classList.remove('nudge'); void p.offsetWidth; p.classList.add('nudge'); $('#callUp').focus(); return; }
-    const last = a.c[a.c.length - 1];
-    if (PROG.calls.some(c => c.key === a.key && c.status === 'open')) { callNote(`You already have an open call on ${a.label}. It resolves 5 trading days after ${fmtDate(PROG.calls.find(c => c.key === a.key && c.status === 'open').base_date)}; pick another asset meanwhile.`, 'warn'); return; }
-    const conf = Number($('#callConf').value) / 100;
-    PROG.calls.unshift({ id: Date.now().toString(36), key: a.key, label: a.label, dir: CALL.dir, conf, made: today(), base_date: last[0], base: last[1], kind: a.kind, model_p: a.model ? a.model.prob_up : null, status: 'open' });
-    PROG.calls = PROG.calls.slice(0, 200);
-    const said = `${a.label} ${CALL.dir > 0 ? 'higher' : 'lower'} in 5 trading days, ${Math.round(conf * 100)}% sure`;
-    setDir(0); award('call'); renderCalls();
-    callNote(`Locked in: ${said}. It resolves by itself when the prices arrive; see it under Your calls.`, 'ok');
-    toast(`Call locked in: ${said}`, null);
-    const row = $('#callsTbl tbody tr'); if (row) { row.classList.add('fresh'); setTimeout(() => row.classList.remove('fresh'), 2600); }
-  });
-  function resolveCalls() {
-    let changed = false;
-    PROG.calls.forEach(c => {
-      if (c.status !== 'open') return;
-      const a = findAsset(c.key); if (!a) return;
-      const i = a.c.findIndex(p => p[0] === c.base_date);
-      if (i < 0 || i + 5 >= a.c.length) { if (i < 0 && a.c[0][0] > c.base_date && a.c.length) { c.status = 'void'; changed = true; } return; }
-      const end = a.c[i + 5];
-      const raw = end[1] - c.base; const upMove = (a.kind === 'inverse' ? -raw : raw) > 0;
-      const pUp = c.dir > 0 ? c.conf : 1 - c.conf; const o = upMove ? 1 : 0;
-      c.brier = Math.round(((pUp - o) ** 2) * 1e4) / 1e4; c.model_brier = c.model_p != null ? Math.round(((c.model_p - o) ** 2) * 1e4) / 1e4 : null;
-      c.right = (c.dir > 0) === upMove; c.end_date = end[0]; c.end = end[1]; c.status = 'resolved'; changed = true;
-      const pts = Math.max(5, Math.round((0.25 - c.brier) * 240));
-      gainXp(pts, `${c.label}: call ${c.right ? 'right' : 'wrong'}, Brier ${c.brier.toFixed(2)}`);
-    });
-    if (changed) { checkBadges(); save(); renderPlayer(); }
-  }
-  function renderCalls() {
-    const cs = PROG.calls; const rs = resolved(PROG);
-    $('#callsCount').textContent = cs.length ? `${cs.filter(c => c.status === 'open').length} open · ${rs.length} resolved · ${rs.filter(c => c.right).length} right` : '';
-    $('#callsTbl').innerHTML = cs.length ? `<table><thead><tr><th>Made</th><th>Asset</th><th>Call</th><th>Sure</th><th>Model</th><th>Outcome</th><th>Your Brier</th><th>Model Brier</th></tr></thead><tbody>${cs.slice(0, 40).map(c => `<tr><td class="num small">${fmtDate(c.made)}</td><td>${esc(c.label)}</td><td class="${c.dir > 0 ? 'up' : 'down'}"><b>${c.dir > 0 ? '▲ higher' : '▼ lower'}</b></td><td class="num">${pct(c.conf)}</td><td class="num muted">${c.model_p != null ? pct(c.model_p) + ' up' : '–'}</td><td>${c.status === 'open' ? '<span class="tag">open</span>' : c.status === 'void' ? '<span class="tag">no price data</span>' : `<span class="tag ${c.right ? 'good' : 'bad'}">${c.right ? 'right' : 'wrong'}</span> <span class="muted small">${fmtDate(c.end_date)}</span>`}</td><td class="num">${c.brier != null ? c.brier.toFixed(2) : '–'}</td><td class="num muted">${c.model_brier != null ? c.model_brier.toFixed(2) : '–'}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No calls yet. Make your first one above.</p>';
-    const withM = rs.filter(c => c.model_brier != null);
-    if (rs.length) {
-      const you = avg(rs.map(c => c.brier)), mod = withM.length ? avg(withM.map(c => c.model_brier)) : null;
-      $('#vsBox').innerHTML = `<div class="vs"><div class="side"><span class="eyebrow">You</span><b>${you.toFixed(3)}</b><span class="small muted">${rs.filter(c => c.right).length} of ${rs.length} right</span></div><span class="x">vs</span><div class="side"><span class="eyebrow">Model</span><b>${mod != null ? mod.toFixed(3) : '–'}</b><span class="small muted">same calls</span></div></div><p class="small muted">Lower is better. 0.250 is what always saying 50% scores. ${mod != null ? (you < mod ? 'You are ahead of the model so far.' : 'The model is ahead so far.') : ''} Ten or more calls are needed before the gap means much.</p>`;
-    }
-  }
-
   // ======================= data =======================
   (async function initData() {
-    loadLocal(); renderPlayer();
     let db = null; try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { db = null; }
     let user = null; try { user = window.claude && window.claude.use ? await window.claude.use('user') : null; } catch (e) { user = null; }
     ME.db = db; ME.user = user;
@@ -1775,9 +1561,9 @@
     const sub = (path, key, after) => db.doc(path).onSnapshot(s => { LIVE[key] = s.exists ? s.data() : null; if (after) after(); }, () => {});
     sub('feed/latest', 'feed', () => { renderLive(); renderHome(); });
     sub('status/run', 'status', () => { renderLive(); renderHome(); });
-    sub('signals/latest', 'signals', () => { renderLive(); renderHome(); renderStocks(); if (selected) renderDetail(); if (VIEW === 'arena') renderArena(); });
+    sub('signals/latest', 'signals', () => { renderLive(); renderHome(); renderStocks(); if (selected) renderDetail(); });
     sub('correlations/latest', 'corr', renderCorr);
-    sub('prices/latest', 'prices', () => { resolveCalls(); if (VIEW === 'arena') renderArena(); if (FOC.data) renderFocus(); });
+    sub('prices/latest', 'prices', () => { if (FOC.data) renderFocus(); });
     db.doc('focus/latest').onSnapshot(s => { FOC.data = s.exists ? s.data() : null; renderFocus(); renderHomeFocus(); }, () => {});
     db.doc('dossier/index').onSnapshot(s => { RES.index.pub = s.exists ? (s.data().items || []) : []; researchIndex(); if (VIEW === 'research' && !RES.key) renderResearch(); }, () => {});
     sub('calibration/links', 'cal', () => { CAL = {}; ((LIVE.cal && LIVE.cal.edges) || []).forEach(c => { CAL[c.s + '>' + c.t] = c; }); if (selected) renderDetail(); });
@@ -1785,11 +1571,8 @@
     db.doc('stocks/index').onSnapshot(s => { STK.index = s.exists ? s.data() : null; renderStocks(); if (PF.holdings.length && SCR.data) analysePortfolio(); if (STK.index && STK.current === null) { const f = STK.index.stocks.XOM ? 'XOM' : Object.keys(STK.index.stocks)[0]; $('#stockQ').value = f; openStock(f); } }, () => {});
     db.doc('stocks/factors').onSnapshot(s => { STK.factors = s.exists ? s.data() : null; STK.shards = {}; renderStocks(); }, () => {});
     if (ME.owner) db.doc('owner/dossier-index').onSnapshot(s => { RES.index.own = s.exists ? (s.data().items || []) : []; researchIndex(); if (VIEW === 'research' && !RES.key) renderResearch(); }, () => {});
-    if (ME.owner) db.doc('owner/portfolio').onSnapshot(s => { OWN.data = s.exists ? s.data() : null; renderOwner(); renderHomePf(); renderPlayer(); renderFocus(); renderHomeFocus(); if (VIEW === 'arena') renderArena(); }, () => {});
+    if (ME.owner) db.doc('owner/portfolio').onSnapshot(s => { OWN.data = s.exists ? s.data() : null; renderOwner(); renderHomePf(); renderFocus(); renderHomeFocus(); }, () => {});
     if (ME.uid) {
-      G.ref = db.doc(`data/users/${ME.uid}/progress`);
-      try { const snap = await G.ref.get(); if (snap.exists) { const d = snap.data(); if (d && d.v === 1 && (d.xp || 0) >= (PROG.xp || 0)) PROG = Object.assign(blank(), d); } else if (PROG.xp) save(); } catch (_) {}
-      G.loaded = true; renderPlayer();
       RES.reqRef = db.doc(`data/users/${ME.uid}/requests`);
       RES.reqRef.onSnapshot(s => { RES.req = s.exists ? s.data() : null; if (VIEW === 'research' && RES.doc) { const a = $('#rActions'); if (a) renderResearch(); } }, () => {});
       PF.ref = db.doc(`data/users/${ME.uid}/portfolio`);

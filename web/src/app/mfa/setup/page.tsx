@@ -16,7 +16,8 @@ export default function MfaSetup() {
       if (list?.totp?.some((f) => f.status === "verified")) return location.replace("/mfa");
       // clear half-finished enrolments so a reload starts cleanly
       for (const f of list?.all ?? []) if (f.status === "unverified") await sb.auth.mfa.unenroll({ factorId: f.id });
-      const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: `Authenticator ${new Date().toISOString().slice(0, 10)}` });
+      // the issuer is the name the authenticator app shows; left out, Supabase uses the Site URL's host
+      const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", issuer: "Market Ripple", friendlyName: `Authenticator ${new Date().toISOString().slice(0, 10)}` });
       if (error || !data) return setErr("Could not start two-factor setup. Reload to try again.");
       setFactor({ id: data.id, qr: data.totp.qr_code, secret: data.totp.secret });
     })();
